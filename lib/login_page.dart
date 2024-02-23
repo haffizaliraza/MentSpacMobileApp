@@ -61,6 +61,7 @@ class LoginPage extends StatelessWidget {
                         controller: emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
+                          labelStyle: TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 16.0),

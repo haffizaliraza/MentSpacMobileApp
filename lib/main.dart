@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
       ),
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       // home: LandingPage(),
-      // home: LoginPage(),
-      home: Register(),
+      home: LoginPage(),
+      // home: Register(),
       // home: TermsAndConditions(),
     );
   }
