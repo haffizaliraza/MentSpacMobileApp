@@ -1,0 +1,50 @@
+name: my_flutter_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/groupGoogle.svg
+    - assets/editProfileImage.png
+    - assets/testimonial-1.jpg
+    - assets/testimonial-2.jpg
+    - assets/testimonial-3.jpg
+    - assets/testimonial-4.jpg
+    - assets/testimonial-5.jpg
+    - assets/testimonial-6.jpg
+    - assets/profile-icon.jpg
+    - assets/mentspac.png
+    - assets/logo.svg
+    - assets/image1.webp
+    - assets/image2.webp
+    - assets/image3.jpeg
+    - assets/image4.jpeg
+    - assets/header-smartphone.png
+    - assets/groupCard.jpg
+    - assets/features-icon-1.svg
+    - assets/features-icon-2.svg
+    - assets/features-icon-3.svg
+    - assets/features-icon-4.svg
+    - assets/features-icon-5.svg
+    - assets/features-icon-6.svg
+    - assets/details-lightbox.jpg
+    - assets/details-1.jpg
+    - assets/details-2.jpg
+    - assets/details-3.jpg
+    - assets/default.png
+    - assets/conclusion-smartphone.png
