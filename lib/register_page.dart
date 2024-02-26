@@ -1,7 +1,18 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/terms_page.dart';
 import 'login_page.dart';
+import 'home_page.dart';
 import 'terms_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Register(),
+  ));
+}
 
 class Register extends StatefulWidget {
   @override
@@ -18,6 +29,118 @@ class _RegisterState extends State<Register> {
   TextEditingController addressController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPswdController = TextEditingController();
+
+  bool isLoading = false;
+
+  Future<void> registerUser(BuildContext context) async {
+    final String apiUrl = 'http://mentspac.com:8000/api/auth/register';
+
+    // Reset validation errors
+    setState(() {
+      validationError = '';
+    });
+
+    // Check if passwords match
+    if (passwordController.text != confirmPswdController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Passwords do not match.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+      return; // Stop the registration process if passwords don't match
+    }
+
+    // Validate required fields
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        firstNameController.text.isEmpty ||
+        lastNameController.text.isEmpty ||
+        addressController.text.isEmpty ||
+        cityController.text.isEmpty) {
+      setState(() {
+        validationError = 'Email and Password Fields are Required';
+        isLoading = false;
+      });
+
+      // Show validation error as a Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(validationError),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          'email': emailController.text,
+          'password': passwordController.text,
+          'first_name': firstNameController.text,
+          'last_name': lastNameController.text,
+          'address': addressController.text,
+          'city': cityController.text,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        print('Registration Successful');
+        print('Response: ${response.body}');
+
+        // Store user information in local storage
+        final Map<String, dynamic> userData = jsonDecode(response.body);
+        await storeUserData(userData);
+
+        // Show success Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration successful.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to Home Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LandingPage()),
+        );
+      } else {
+        print('Registration Failed');
+        print('Response: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration failed. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error catch error: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again later.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> storeUserData(Map<String, dynamic> userData) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Store the entire user data as a JSON string
+    prefs.setString('token', jsonEncode(userData));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +168,12 @@ class _RegisterState extends State<Register> {
                 Text(
                   "Create an account",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Form(
                   child: Column(
                     children: [
@@ -60,139 +183,30 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(color: Colors.red),
                         ),
                       const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Your Email',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                labelText: 'Email',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'Your Email',
+                        'Email',
+                        emailController,
                       ),
-                      const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'First Name',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: firstNameController,
-                              decoration: InputDecoration(
-                                labelText: 'First name',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'First Name',
+                        'First name',
+                        firstNameController,
                       ),
-                      const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Last Name',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: lastNameController,
-                              decoration: InputDecoration(
-                                labelText: 'Last name',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'Last Name',
+                        'Last name',
+                        lastNameController,
                       ),
-                      const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'City',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: cityController,
-                              decoration: InputDecoration(
-                                labelText: 'City',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'City',
+                        'City',
+                        cityController,
                       ),
-                      const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Address',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: addressController,
-                              decoration: InputDecoration(
-                                labelText: 'Address',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'Address',
+                        'Address',
+                        addressController,
                       ),
                       Row(
                         children: [
@@ -208,131 +222,32 @@ class _RegisterState extends State<Register> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Password',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                labelText: '*********',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'Password',
+                        '*********',
+                        passwordController,
+                        isPassword: true,
                       ),
-                      const SizedBox(height: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Confirm Password',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: TextField(
-                              controller: confirmPswdController,
-                              decoration: InputDecoration(
-                                labelText: '*********',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 16.0),
-                              ),
-                            ),
-                          ),
-                        ],
+                      buildInputField(
+                        'Confirm Password',
+                        '*********',
+                        confirmPswdController,
+                        isPassword: true,
                       ),
                       const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate to RegisterPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TermsAndConditions()),
-                          );
+                      buildTermsAndConditions(),
+                      const SizedBox(height: 20),
+                      buildElevatedButton(
+                        'Create an Account',
+                        () {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          registerUser(context);
                         },
-                        child: RichText(
-                          text: TextSpan(
-                            text:
-                                "By clicking Create an account, you agree to our ",
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Terms and Conditions',
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Print the data from the fields
-                          print('Email: ${emailController.text}');
-                          // print('Password: ${passwordController.text}');
-                          // Add your login logic here
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.blue),
-                          minimumSize: MaterialStateProperty.all<Size>(
-                              const Size(double.infinity, 48)),
-                        ),
-                        child: const Text('Create an Account',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate to RegisterPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()),
-                          );
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Already have an account? ",
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Login',
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      buildLoginLink(),
                     ],
                   ),
                 ),
@@ -343,10 +258,115 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
-}
 
-void main() {
-  runApp(MaterialApp(
-    home: Register(),
-  ));
+  Widget buildInputField(
+    String label,
+    String hintText,
+    TextEditingController controller, {
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: TextField(
+            controller: controller,
+            obscureText: isPassword,
+            decoration: InputDecoration(
+              labelText: hintText,
+              labelStyle: TextStyle(color: Colors.grey),
+              border: OutlineInputBorder(),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildTermsAndConditions() {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to TermsAndConditions
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TermsAndConditions()),
+        );
+      },
+      child: RichText(
+        text: TextSpan(
+          text: "By clicking Create an account, you agree to our ",
+          style: const TextStyle(
+            color: Colors.grey,
+          ),
+          children: [
+            TextSpan(
+              text: 'Terms and Conditions',
+              style: const TextStyle(
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildElevatedButton(String label, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+        minimumSize: MaterialStateProperty.all<Size>(
+          const Size(double.infinity, 48),
+        ),
+      ),
+      child: isLoading
+          ? CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            )
+          : Text(
+              label,
+              style: TextStyle(color: Colors.white),
+            ),
+    );
+  }
+
+  Widget buildLoginLink() {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to LoginPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      },
+      child: RichText(
+        text: TextSpan(
+          text: "Already have an account? ",
+          style: const TextStyle(
+            color: Colors.grey,
+          ),
+          children: [
+            TextSpan(
+              text: 'Login',
+              style: const TextStyle(
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -3,6 +3,7 @@ import 'home_page.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 import 'terms_page.dart';
+import 'about_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       home: LoginPage(),
       // home: Register(),
       // home: TermsAndConditions(),
+      // home: AboutPage(),
     );
   }
 }
