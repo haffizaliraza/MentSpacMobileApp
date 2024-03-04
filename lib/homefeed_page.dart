@@ -49,7 +49,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
         // Use authToken instead of tokenString in the Authorization header
         final url = Uri.parse(
-            'http://localhost:8000/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
+            'http://mentspac.com/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
         try {
           final response = await http.get(url, headers: {
             'Authorization': 'Token $authToken',

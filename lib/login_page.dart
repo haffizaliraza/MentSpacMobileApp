@@ -12,7 +12,7 @@ class LoginPage extends StatelessWidget {
 
   Future<void> loginUser(
       String email, String password, BuildContext context) async {
-    final String apiUrl = 'http://localhost:8000/api/auth/login';
+    final String apiUrl = 'http://mentspac.com/api/auth/login';
 
     try {
       final response = await http.post(

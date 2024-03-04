@@ -101,7 +101,7 @@ class _SinglePostState extends State<SinglePost> {
       Map<String, dynamic> tokenMap = json.decode(tokenString);
       String? authToken = tokenMap['auth_token'];
       if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments';
+        final apiUrl = 'http://mentspac.com/api/comments';
 
         // Replace 'YOUR_ACCESS_TOKEN' with the actual access token or authentication mechanism you are using
         final headers = {
