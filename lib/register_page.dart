@@ -33,7 +33,7 @@ class _RegisterState extends State<Register> {
   bool isLoading = false;
 
   Future<void> registerUser(BuildContext context) async {
-    final String apiUrl = 'http://mentspac.com:8000/api/auth/register';
+    final String apiUrl = 'http://localhost:8000/api/auth/register';
 
     // Reset validation errors
     setState(() {
@@ -55,12 +55,12 @@ class _RegisterState extends State<Register> {
     }
 
     // Validate required fields
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        firstNameController.text.isEmpty ||
-        lastNameController.text.isEmpty ||
-        addressController.text.isEmpty ||
-        cityController.text.isEmpty) {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty
+        // firstNameController.text.isEmpty ||
+        // lastNameController.text.isEmpty ||
+        // addressController.text.isEmpty ||
+        // cityController.text.isEmpty
+        ) {
       setState(() {
         validationError = 'Email and Password Fields are Required';
         isLoading = false;
@@ -100,7 +100,7 @@ class _RegisterState extends State<Register> {
         // Show success Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Registration successful.'),
+            content: Text('Registration Successful.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -113,26 +113,68 @@ class _RegisterState extends State<Register> {
       } else {
         print('Registration Failed');
         print('Response: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Registration failed. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+
+        // Handle error messages from the API response
+        final dynamic responseBody = response.body;
+
+        if (responseBody is String) {
+          // If the response body is a string, try to decode it as JSON
+          try {
+            final Map<String, dynamic> errorData = json.decode(responseBody);
+
+            if (errorData.containsKey('password')) {
+              // Show password-related errors
+              final List<String> passwordErrors =
+                  List<String>.from(errorData['password']);
+              passwordErrors.forEach((error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(error),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              });
+            } else if (errorData.containsKey('error')) {
+              // Show general error message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(errorData['error']),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else {
+              showGenericErrorSnackbar(context);
+            }
+          } catch (e) {
+            // If decoding as JSON fails, treat it as a plain string
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(responseBody),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } else {
+          showGenericErrorSnackbar(context);
+        }
       }
     } catch (error) {
       print('Error catch error: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred. Please try again later.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showGenericErrorSnackbar(context);
     } finally {
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  void showGenericErrorSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('An error occurred. Please try again later.'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   Future<void> storeUserData(Map<String, dynamic> userData) async {

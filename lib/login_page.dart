@@ -1,21 +1,18 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'register_page.dart';
 import 'package:http/http.dart' as http;
 import 'home_page.dart';
+import 'forgotPassword_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
-}
+import 'user_token.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   Future<void> loginUser(
       String email, String password, BuildContext context) async {
-    final String apiUrl = 'http://mentspac.com:8000/api/auth/login';
+    final String apiUrl = 'http://localhost:8000/api/auth/login';
 
     try {
       final response = await http.post(
@@ -27,8 +24,11 @@ class LoginPage extends StatelessWidget {
         print('Login Successful');
         print('Response: ${response.body}');
 
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final UserToken userToken = UserToken.fromJson(responseData);
+
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('token', response.body);
+        prefs.setString('token', json.encode(userToken.toJson()));
 
         Navigator.pushReplacement(
           context,
@@ -38,25 +38,47 @@ class LoginPage extends StatelessWidget {
         print('Login Failed');
         print('Response: ${response.body}');
 
-        // Display error message to the user
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login failed. Please provide correct credentials.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        final dynamic responseBody = response.body;
+
+        if (responseBody is String) {
+          try {
+            final Map<String, dynamic> errorData = json.decode(responseBody);
+
+            if (errorData.containsKey('error')) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(errorData['error']),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else {
+              showGenericErrorSnackbar(context);
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(responseBody),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } else {
+          showGenericErrorSnackbar(context);
+        }
       }
     } catch (error) {
       print('Error catch error: $error');
-
-      // Display a generic error message to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred. Please try again later.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showGenericErrorSnackbar(context);
     }
+  }
+
+  void showGenericErrorSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('An error occurred. Please try again later.'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
@@ -153,7 +175,11 @@ class LoginPage extends StatelessWidget {
                       const Spacer(),
                       InkWell(
                         onTap: () {
-                          // Add your forgot password logic here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPasswordPage()),
+                          );
                         },
                         child: const Text(
                           'Forgot password?',
@@ -167,7 +193,6 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Validate email and password before calling loginUser
                       if (emailController.text.isEmpty ||
                           passwordController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(

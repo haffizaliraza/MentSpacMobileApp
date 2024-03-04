@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_page.dart';
+import 'about_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -33,7 +37,7 @@ class LandingPage extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue, // Set your desired color
+          backgroundColor: Colors.teal[100],
           title: Text(
             'MentSpac',
             style: TextStyle(
@@ -42,12 +46,54 @@ class LandingPage extends StatelessWidget {
             ),
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                // Navigate to About Page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AboutPage()));
+              },
+              child: Text(
+                'About',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Navigate to Careers Page
+                // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => CareersPage()));
+              },
+              child: Text(
+                'Careers',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomeFeeds()));
+              },
+              child: Text(
+                'HomeFeed',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
             IconButton(
               onPressed: () {
+                // Handle logout
                 signUserOut(context);
               },
-              icon: const Icon(Icons.logout),
-            )
+              icon: Icon(Icons.logout),
+            ),
+            // Add buttons for About and Careers pages
           ],
         ),
         body: SingleChildScrollView(
@@ -200,20 +246,35 @@ class LandingPage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          // const SizedBox(height: 8),
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     buildListItem(
+                          //       'Features that will help you and your marketers',
+                          //     ),
+                          //     buildListItem(
+                          //       'Smooth learning curve due to the knowledge base',
+                          //     ),
+                          //     buildListItem(
+                          //       'Ready out-of-the-box with minor setup settings',
+                          //     ),
+                          //   ],
+                          // ),
                           const SizedBox(height: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildListItem(
-                                'Features that will help you and your marketers',
-                              ),
-                              buildListItem(
-                                'Smooth learning curve due to the knowledge base',
-                              ),
-                              buildListItem(
-                                'Ready out-of-the-box with minor setup settings',
-                              ),
-                            ],
+                          Text(
+                            'Features that will help you and your marketers',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Smooth learning curve due to the knowledge base',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Ready out-of-the-box with minor setup settings',
+                            style: TextStyle(fontSize: 16),
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -277,6 +338,7 @@ class LandingPage extends StatelessWidget {
               ),
 
               // Counter Section
+              const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
                 color: Colors.white,
@@ -286,16 +348,17 @@ class LandingPage extends StatelessWidget {
                     buildCounter('Happy Users', 231),
                     buildCounter('Issues Solved', 385),
                     buildCounter('Good Reviews', 159),
-                    buildCounter('Case Studies', 127),
-                    buildCounter('Orders Received', 211),
+                    // buildCounter('Case Studies', 127),
+                    // buildCounter('Orders Received', 211),
                   ],
                 ),
               ),
 
               // Slider Section
+              const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.grey,
+                color: Colors.blueGrey[500],
                 child: Column(
                   children: [
                     Text(
@@ -307,18 +370,17 @@ class LandingPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // You can use a Flutter carousel/slider package for this section
-                    // Example: https://pub.dev/packages/carousel_slider
-                    // (Make sure to replace the image paths accordingly)
-                    // ...
+                    // Add the carousel/slider here
+                    TestimonialsCarousel(),
                   ],
                 ),
               ),
 
               // Pricing Section
+              const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.blue,
+                color: Colors.blueGrey[500],
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -337,7 +399,29 @@ class LandingPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     // Pricing cards go here
-                    // ...
+                    PricingCard(
+                      title: 'STANDARD',
+                      price: '\$29',
+                      frequency: 'monthly',
+                      description:
+                          'This basic package covers the marketing needs of small startups',
+                    ),
+                    const SizedBox(height: 16),
+                    PricingCard(
+                      title: 'ADVANCED',
+                      price: '\$39',
+                      frequency: 'monthly',
+                      description:
+                          'This is a more advanced package suited for medium companies',
+                    ),
+                    const SizedBox(height: 16),
+                    PricingCard(
+                      title: 'COMPLETE',
+                      price: '\$49',
+                      frequency: 'monthly',
+                      description:
+                          'This is a comprehensive package designed for big organizations',
+                    ),
                   ],
                 ),
               ),
@@ -349,13 +433,14 @@ class LandingPage extends StatelessWidget {
   }
 
   // Function to build feature card
-  Widget buildFeatureCard(String title, String description, String imagePath) {
+  Widget buildFeatureCard(String title, String description, String svgPath) {
     return Card(
       child: Column(
         children: [
-          Image.asset(
-            imagePath, // Replace with the actual image path
-            height: 100,
+          SvgPicture.asset(
+            svgPath, // Check if this path is correct
+            height: 50,
+            color: Color.fromARGB(255, 205, 31, 221),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -365,7 +450,7 @@ class LandingPage extends StatelessWidget {
                   title,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 18),
                 Text(description),
               ],
             ),
@@ -399,4 +484,146 @@ class LandingPage extends StatelessWidget {
       ],
     );
   }
+}
+
+class TestimonialsCarousel extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 200.0,
+        enlargeCenterPage: true,
+        autoPlay: true,
+        aspectRatio: 16 / 9,
+        autoPlayCurve: Curves.fastOutSlowIn,
+        enableInfiniteScroll: true,
+        autoPlayAnimationDuration: Duration(milliseconds: 800),
+        viewportFraction: 0.8,
+      ),
+      items: [
+        // Add your testimonial items here
+        buildTestimonialCard(
+            'Jude Thorn - Designer',
+            "It's been so fun to work with Pavo, I've managed to integrate it properly into my business flow and it's great",
+            'testimonial-1.jpg'),
+        buildTestimonialCard(
+            'Roy Smith - Developer',
+            "We were so focused on launching as many campaigns as possible that we've forgotten to target our loyal customers",
+            'testimonial-2.jpg'),
+        buildTestimonialCard(
+            'Marsha Singer - Marketer',
+            "I've been searching for a tool like Pavo for so long. I love the reports it generates and the amazing high accuracy",
+            'testimonial-3.jpg'),
+      ],
+    );
+  }
+
+  Widget buildTestimonialCard(
+      String title, String description, String imagePath) {
+    return Container(
+      margin: EdgeInsets.all(5.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          gradient: LinearGradient(
+            begin: Alignment.bottomRight,
+            stops: [0.1, 0.9],
+            colors: [
+              Colors.black.withOpacity(0.7),
+              Colors.black.withOpacity(0.1),
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              description,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Widget PricingCard({
+  required String title,
+  required String price,
+  required String frequency,
+  required String description,
+}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.all(16),
+    color: Colors.white,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Text(
+              '\$',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              price,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          frequency,
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(description),
+        const SizedBox(height: 8),
+        ElevatedButton(
+          onPressed: () {
+            // Handle button press
+          },
+          child: Text('Download'),
+        ),
+      ],
+    ),
+  );
 }
