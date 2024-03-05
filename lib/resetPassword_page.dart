@@ -24,7 +24,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   // Future<void> performResetPassword() async {
-  //   final String apiUrl = 'http://localhost:8000/api/reset-password';
+  //   final String apiUrl = 'http://mentspac.com/api/reset-password';
 
   //   try {
   //     final response = await http.post(
@@ -60,7 +60,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   // }
 
   Future<void> performResetPassword() async {
-    final String apiUrl = 'http://localhost:8000/api/reset-password';
+    final String apiUrl = 'http://mentspac.com/api/reset-password';
 
     try {
       final response = await http.post(

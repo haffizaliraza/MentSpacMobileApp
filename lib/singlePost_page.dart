@@ -20,7 +20,7 @@ class PostProps {
   final String post_image;
   final dynamic post_owner;
   final String date_created;
-  final bool is_pinned;
+  bool is_pinned;
   final int pinned_id;
   final List<dynamic> comments;
   final String post_contentType;
@@ -41,6 +41,8 @@ class PostProps {
     required this.post_contentType,
   });
 }
+
+bool isEditingComment = false;
 
 class AppState {
   final bool isEdit;
@@ -95,6 +97,10 @@ class _SinglePostState extends State<SinglePost> {
   AudioPlayer? _audioPlayer;
 
   Future<void> createComment() async {
+    setState(() {
+      isLoadingComment = true; // Set loading indicator to true
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? tokenString = prefs.getString('token');
     if (tokenString != null) {
@@ -123,13 +129,25 @@ class _SinglePostState extends State<SinglePost> {
           );
 
           if (response.statusCode == 201) {
-            // Comment created successfully
-            // You can handle the success state as needed
+            Map<String, dynamic> commentData = json.decode(response.body);
+
+            // Create a new comment object from the response
+            dynamic newComment = {
+              'id': commentData['id'],
+              'comment_owner': commentData['comment_owner'],
+              'comment_content': commentData['comment_content'],
+              'like': commentData['like'],
+              'date_created': commentData['date_created'],
+              'comment_post': commentData['comment_post'],
+            };
+
+            // Update the local state to include the new comment
             setState(() {
               isSuccessComment = true;
-              content =
-                  ''; // Clear the content after successful comment creation
+              content = '';
+              postData.comments.add(newComment);
             });
+            showToast('Comment posted successfully');
           } else {
             // Handle other response statuses or errors
             print(
@@ -140,6 +158,10 @@ class _SinglePostState extends State<SinglePost> {
           // Handle any exceptions during the API call
           print('Error creating comment: $error');
           showToast('Error creating comment');
+        } finally {
+          setState(() {
+            isLoadingComment = false; // Set loading indicator to false
+          });
         }
       }
     }
@@ -191,18 +213,176 @@ class _SinglePostState extends State<SinglePost> {
     });
   }
 
+  // void handleEdit(int id, String content) {
+  //   setState(() {
+  //     commentId = id;
+  //     this.content = content;
+  //     AuthActions.setEditValue(true);
+  //   });
+  // }
+
   void handleEdit(int id, String content) {
     setState(() {
       commentId = id;
       this.content = content;
+      isEditingComment = true;
       AuthActions.setEditValue(true);
     });
   }
 
   Future<void> handleDelete(int deleteId) async {
-    // You need to implement the delete functionality
-    // based on your API or data handling mechanism
-    // and handle the state accordingly.
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? tokenString = prefs.getString('token');
+
+    if (tokenString != null) {
+      Map<String, dynamic> tokenMap = json.decode(tokenString);
+      String? authToken = tokenMap['auth_token'];
+
+      if (authToken != null) {
+        final apiUrl = 'http://mentspac.com/api/comments/$deleteId';
+
+        final headers = {
+          'Authorization': 'Token $authToken',
+        };
+
+        try {
+          final response = await http.delete(
+            Uri.parse(apiUrl),
+            headers: headers,
+          );
+
+          if (response.statusCode == 204) {
+            // Comment deleted successfully
+            // Update the local state to remove the deleted comment
+            setState(() {
+              postData.comments
+                  .removeWhere((comment) => comment['id'] == deleteId);
+            });
+
+            // Show a success dialog
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Success'),
+                  content: Text('Comment deleted successfully.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            // Handle other response statuses or errors
+            print(
+                'Error deleting comment. Status code: ${response.statusCode}');
+
+            // Show an error dialog
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('Failed to delete comment. Please try again.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        } catch (error) {
+          // Handle any exceptions during the API call
+          print('Error deleting comment: $error');
+
+          // Show an error dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error'),
+                content: Text('Failed to delete comment. Please try again.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> handleUpdate(int updateId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? tokenString = prefs.getString('token');
+
+    if (tokenString != null) {
+      Map<String, dynamic> tokenMap = json.decode(tokenString);
+      String? authToken = tokenMap['auth_token'];
+
+      if (authToken != null) {
+        final apiUrl = 'http://mentspac.com/api/comments/$updateId';
+
+        final headers = {
+          'Authorization': 'Token $authToken',
+          'Content-Type': 'application/json',
+        };
+
+        final body = {
+          'comment_content': content,
+        };
+
+        try {
+          final response = await http.put(
+            Uri.parse(apiUrl),
+            headers: headers,
+            body: json.encode(body),
+          );
+
+          if (response.statusCode == 200) {
+            // Comment updated successfully
+
+            // Update the local state to reflect the changes
+            setState(() {
+              final updatedComment = postData.comments
+                  .firstWhere((comment) => comment['id'] == updateId);
+              updatedComment['comment_content'] = content;
+            });
+
+            // Close the edit mode
+            AuthActions.setEditValue(false);
+            setState(() {
+              isEditingComment = false;
+            });
+          } else {
+            // Handle other response statuses or errors
+            print(
+                'Error updating comment. Status code: ${response.statusCode}');
+            showToast('Error updating comment');
+          }
+        } catch (error) {
+          // Handle any exceptions during the API call
+          print('Error updating comment: $error');
+          showToast('Error updating comment');
+        }
+      }
+    }
   }
 
   void handleChange(String value) {
@@ -390,14 +570,19 @@ class _SinglePostState extends State<SinglePost> {
                           child: TextFormField(
                             controller: commentController,
                             onChanged: handleChange,
+                            initialValue: isEditingComment ? content : null,
                             decoration: InputDecoration(
                               hintText: 'Enter your comment',
                             ),
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: content.isEmpty ? null : handleSubmit,
-                          child: Text('Create'),
+                          onPressed: content.isEmpty
+                              ? null
+                              : (isEditingComment
+                                  ? () => handleUpdate(commentId)
+                                  : handleSubmit),
+                          child: Text(isEditingComment ? 'Update' : 'Create'),
                         ),
                       ],
                     ),
@@ -453,6 +638,8 @@ class _SinglePostState extends State<SinglePost> {
                                       Expanded(
                                         child: TextFormField(
                                           onChanged: handleChange,
+                                          initialValue:
+                                              comment['comment_content'],
                                           // value: content,
                                           decoration: InputDecoration(
                                             hintText: 'Enter your comment',
@@ -462,6 +649,16 @@ class _SinglePostState extends State<SinglePost> {
                                     else
                                       Expanded(
                                         child: Text(comment['comment_content']),
+                                      ),
+                                    if (isEditingComment)
+                                      ElevatedButton(
+                                        onPressed: content.isEmpty ||
+                                                commentId != comment['id']
+                                            ? null
+                                            : (() =>
+                                                handleUpdate(comment['id'])),
+                                        // : (() => handleUpdate(commentId)),
+                                        child: Text('Update'),
                                       ),
                                     Icon(Icons.thumb_up),
                                   ],
@@ -473,11 +670,12 @@ class _SinglePostState extends State<SinglePost> {
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.delete),
-                                      onPressed: () => handleDelete(comment.id),
+                                      onPressed: () =>
+                                          handleDelete(comment['id']),
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.edit),
-                                      onPressed: () => handleEdit(comment.id,
+                                      onPressed: () => handleEdit(comment['id'],
                                           comment['comment_content']),
                                     ),
                                   ],
@@ -508,9 +706,52 @@ class _SinglePostState extends State<SinglePost> {
   }
 
   Future<void> pinUnpinedPost() async {
-    // You need to implement the pin/unpin post functionality
-    // based on your API or data handling mechanism
-    // and handle the state accordingly.
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? tokenString = prefs.getString('token');
+
+    if (tokenString != null) {
+      Map<String, dynamic> tokenMap = json.decode(tokenString);
+      String? authToken = tokenMap['auth_token'];
+
+      if (authToken != null) {
+        final apiUrl = 'http://mentspac.com/api/pin';
+
+        final headers = {
+          'Authorization': 'Token $authToken',
+          'Content-Type': 'application/json',
+        };
+
+        final body = {
+          'post': postData.id,
+          'user': 1, // Replace with the actual user ID or fetch it dynamically
+        };
+
+        try {
+          final response = await http.post(
+            Uri.parse(apiUrl),
+            headers: headers,
+            body: json.encode(body),
+          );
+
+          if (response.statusCode == 200) {
+            // Post pinned/unpinned successfully
+            // Update the local state to reflect the changes
+            setState(() {
+              postData.is_pinned = !postData.is_pinned;
+            });
+          } else {
+            // Handle other response statuses or errors
+            print(
+                'Error pinning/unpinning post. Status code: ${response.statusCode}');
+            showToast('Error pinning/unpinning post');
+          }
+        } catch (error) {
+          // Handle any exceptions during the API call
+          print('Error pinning/unpinning post: $error');
+          showToast('Error pinning/unpinning post');
+        }
+      }
+    }
   }
 }
 

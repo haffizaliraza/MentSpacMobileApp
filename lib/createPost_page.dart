@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class FileType {
   final String path;
@@ -197,58 +199,160 @@ class _CreatePostState extends State<CreatePost> {
     });
   }
 
+  // Future<void> handleSubmit() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? tokenString = prefs.getString('token');
+
+  //   if (tokenString != null) {
+  //     Map<String, dynamic> tokenMap = json.decode(tokenString);
+  //     String? authToken = tokenMap['auth_token'];
+
+  //     final formData = http.MultipartRequest(
+  //       'POST',
+  //       Uri.parse('http://mentspac.com/api/posts'),
+  //     );
+
+  //     formData.fields.addAll({
+  //       "post_content": post,
+  //       "like": false.toString(),
+  //     });
+
+  //     // if (isImage == "image") {
+  //     //   if (files.path.isNotEmpty) {
+  //     //     // Read the file as bytes
+  //     //     Uint8List fileBytes = await html.File(files.path).readAsBytes();
+
+  //     //     // Add the file as bytes to the form data
+  //     //     formData.files.add(
+  //     //       http.MultipartFile.fromBytes('post_image', fileBytes,
+  //     //           filename: files.name),
+  //     //     );
+  //     //   }
+  //     // } else if (isImage == "video") {
+  //     //   if (files.path.isNotEmpty) {
+  //     //     Uint8List fileBytes = await html.File(files.path).readAsBytes();
+  //     //     formData.files.add(
+  //     //       http.MultipartFile.fromBytes('post_video', fileBytes,
+  //     //           filename: files.name),
+  //     //     );
+  //     //   }
+  //     // } else if (isImage == "audio") {
+  //     //   if (files.path.isNotEmpty) {
+  //     //     Uint8List fileBytes = await html.File(files.path).readAsBytes();
+  //     //     formData.files.add(
+  //     //       http.MultipartFile.fromBytes('post_audio', fileBytes,
+  //     //           filename: files.name),
+  //     //     );
+  //     //   }
+  //     // }
+
+  //     // Clear form fields after submitting
+  //     setState(() {
+  //       post = "";
+  //       files = FileType(
+  //         path: "",
+  //         lastModified: 0,
+  //         lastModifiedDate: DateTime.now(),
+  //         name: "",
+  //         size: 0,
+  //         type: "",
+  //         webkitRelativePath: "",
+  //       );
+  //       previewUrl = null;
+  //       error = "";
+  //       isOpen = false;
+  //     });
+
+  //     try {
+  //       final response = await formData.send();
+  //       if (response.statusCode == 200) {
+  //         // Handle success, e.g., show a success message to the user
+  //         print('Post created successfully');
+  //       } else {
+  //         // Handle error
+  //         print('Error creating post. Status code: ${response.statusCode}');
+  //       }
+  //     } catch (error) {
+  //       // Handle error
+  //       print('Error creating post: $error');
+  //     }
+  //   }
+  // }
+
   Future<void> handleSubmit() async {
-    final formData = http.MultipartRequest(
-      'POST',
-      Uri.parse(
-          'your_upload_url_here'), // Replace with your server upload endpoint
-    );
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? tokenString = prefs.getString('token');
 
-    formData.fields.addAll({
-      "post_content": post,
-      "like": false.toString(),
-    });
+    if (tokenString != null) {
+      Map<String, dynamic> tokenMap = json.decode(tokenString);
+      String? authToken = tokenMap['auth_token'];
 
-    if (isImage == "image") {
-      formData.files.add(
-        await http.MultipartFile.fromPath('post_image', files.path),
+      final formData = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://mentspac.com/api/posts'),
       );
-    } else if (isImage == "video") {
-      formData.files.add(
-        await http.MultipartFile.fromPath('post_video', files.path),
-      );
-    } else if (isImage == "audio") {
-      formData.files.add(
-        await http.MultipartFile.fromPath('post_audio', files.path),
-      );
-    }
 
-    // Clear form fields after submitting
-    setState(() {
-      post = "";
-      files = FileType(
-        path: "",
-        lastModified: 0,
-        lastModifiedDate: DateTime.now(),
-        name: "",
-        size: 0,
-        type: "",
-        webkitRelativePath: "",
-      );
-      previewUrl = null;
-      error = "";
-      isOpen = false;
-    });
+      formData.fields.addAll({
+        "post_content": post,
+        "like": false.toString(),
+      });
 
-    try {
-      final response = await formData.send();
-      if (response.statusCode == 200) {
-        // Handle success
-      } else {
+      // if (isImage == "image" && files.path.isNotEmpty) {
+      //   // Read the file as bytes
+      //   Uint8List fileBytes = await html.File(files.path).readAsBytes();
+
+      //   // Add the file as bytes to the form data
+      //   formData.files.add(
+      //     http.MultipartFile.fromBytes('post_image', fileBytes,
+      //         filename: files.name),
+      //   );
+      // } else if (isImage == "video" && files.path.isNotEmpty) {
+      //   Uint8List fileBytes = await html.File(files.path).readAsBytes();
+      //   formData.files.add(
+      //     http.MultipartFile.fromBytes('post_video', fileBytes,
+      //         filename: files.name),
+      //   );
+      // } else if (isImage == "audio" && files.path.isNotEmpty) {
+      //   Uint8List fileBytes = await html.File(files.path).readAsBytes();
+      //   formData.files.add(
+      //     http.MultipartFile.fromBytes('post_audio', fileBytes,
+      //         filename: files.name),
+      //   );
+      // }
+
+      // Set authorization header
+      formData.headers['Authorization'] = 'Token $authToken';
+
+      // Clear form fields after submitting
+      setState(() {
+        post = "";
+        files = FileType(
+          path: "",
+          lastModified: 0,
+          lastModifiedDate: DateTime.now(),
+          name: "",
+          size: 0,
+          type: "",
+          webkitRelativePath: "",
+        );
+        previewUrl = null;
+        error = "";
+        isOpen = false;
+      });
+
+      try {
+        final response = await formData.send();
+        if (response.statusCode == 200) {
+          // Handle success, e.g., show a success message to the user
+          print('Post created successfully');
+        } else {
+          // Handle error
+          print('Error creating post. Status code: ${response.statusCode}');
+        }
+      } catch (error) {
         // Handle error
+        print('Error creating post: $error');
       }
-    } catch (error) {
-      // Handle error
     }
   }
 
