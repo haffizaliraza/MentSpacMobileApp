@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:chewie/chewie.dart';
@@ -21,7 +22,7 @@ class PostProps {
   final dynamic post_owner;
   final String date_created;
   bool is_pinned;
-  final int pinned_id;
+  int pinned_id;
   final List<dynamic> comments;
   final String post_contentType;
 
@@ -43,6 +44,7 @@ class PostProps {
 }
 
 bool isEditingComment = false;
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class AppState {
   final bool isEdit;
@@ -107,7 +109,7 @@ class _SinglePostState extends State<SinglePost> {
       Map<String, dynamic> tokenMap = json.decode(tokenString);
       String? authToken = tokenMap['auth_token'];
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com/api/comments';
+        final apiUrl = 'http://mentspac.com:8000/api/comments';
 
         // Replace 'YOUR_ACCESS_TOKEN' with the actual access token or authentication mechanism you are using
         final headers = {
@@ -148,6 +150,7 @@ class _SinglePostState extends State<SinglePost> {
               postData.comments.add(newComment);
             });
             showToast('Comment posted successfully');
+            commentController.clear();
           } else {
             // Handle other response statuses or errors
             print(
@@ -239,7 +242,7 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com/api/comments/$deleteId';
+        final apiUrl = 'http://mentspac.com:8000/api/comments/$deleteId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -337,7 +340,7 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com/api/comments/$updateId';
+        final apiUrl = 'http://mentspac.com:8000/api/comments/$updateId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -370,6 +373,14 @@ class _SinglePostState extends State<SinglePost> {
             setState(() {
               isEditingComment = false;
             });
+
+            Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeFeeds(),
+              ),
+            );
           } else {
             // Handle other response statuses or errors
             print(
@@ -714,36 +725,73 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com/api/pin';
+        final apiUrlPin = 'http://mentspac.com:8000/api/pin';
+        final apiUrlUnPin =
+            'http://mentspac.com:8000/api/pin/${postData.pinned_id}';
 
         final headers = {
           'Authorization': 'Token $authToken',
           'Content-Type': 'application/json',
         };
 
-        final body = {
-          'post': postData.id,
-          'user': 1, // Replace with the actual user ID or fetch it dynamically
-        };
-
         try {
-          final response = await http.post(
-            Uri.parse(apiUrl),
-            headers: headers,
-            body: json.encode(body),
-          );
+          if (postData.is_pinned) {
+            // If post is already pinned, send a DELETE request to unpin it
+            final response = await http.delete(
+              Uri.parse(apiUrlUnPin),
+              headers: headers,
+            );
 
-          if (response.statusCode == 200) {
-            // Post pinned/unpinned successfully
-            // Update the local state to reflect the changes
-            setState(() {
-              postData.is_pinned = !postData.is_pinned;
-            });
+            if (response.statusCode == 204) {
+              // Post unpinned successfully
+              // Update the local state to reflect the changes
+              setState(() {
+                postData.is_pinned = !postData.is_pinned;
+              });
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeFeeds(),
+                ),
+              );
+            } else {
+              // Handle other response statuses or errors
+              print(
+                  'Error unpinning post. Status code: ${response.statusCode}');
+              showToast('Error unpinning post');
+            }
           } else {
-            // Handle other response statuses or errors
-            print(
-                'Error pinning/unpinning post. Status code: ${response.statusCode}');
-            showToast('Error pinning/unpinning post');
+            // If post is not pinned, send a POST request to pin it
+            final response = await http.post(
+              Uri.parse(apiUrlPin),
+              headers: headers,
+              body: json.encode({
+                'post': postData.id,
+                'user':
+                    1, // Replace with the actual user ID or fetch it dynamically
+              }),
+            );
+
+            if (response.statusCode == 201) {
+              // Post pinned successfully
+              // Update the local state to reflect the changes
+              setState(() {
+                postData.is_pinned = !postData.is_pinned;
+              });
+
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeFeeds(),
+                ),
+              );
+            } else {
+              // Handle other response statuses or errors
+              print('Error pinning post. Status code: ${response.statusCode}');
+              showToast('Error pinning post');
+            }
           }
         } catch (error) {
           // Handle any exceptions during the API call

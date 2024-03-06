@@ -22,6 +22,7 @@ dependencies:
   mime_type: ^1.0.0
   chewie: ^1.5.0
   audioplayers: ^5.2.1
+  mime: ^1.0.5
 
 dev_dependencies:
   flutter_test:
