@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/singlePost_page.dart';
