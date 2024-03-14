@@ -10,6 +10,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:mime/mime.dart';
+import 'package:flutter/foundation.dart';
 
 class FileType {
   final String path;
@@ -33,6 +34,7 @@ class FileType {
 
 final TextEditingController postController = TextEditingController();
 String? imagePreviewUrl;
+FileType? files;
 
 class CreatePost extends StatefulWidget {
   final Function(Map<String, dynamic>) uploadFiles;
@@ -70,8 +72,58 @@ class _CreatePostState extends State<CreatePost> {
     id = "some_id";
   }
 
+  // Future<void> validateFileType(FileType files) async {
+  //   if (files.path.isEmpty) {
+  //     setState(() {
+  //       error = "Empty";
+  //     });
+  //     return;
+  //   }
+
+  //   const List<String> validImageTypes = [
+  //     "image/jpeg",
+  //     "image/png",
+  //     "image/gif"
+  //   ];
+  //   const List<String> validVideoTypes = [
+  //     "video/mp4",
+  //     "video/mpeg",
+  //     "video/webm"
+  //   ];
+  //   const List<String> validAudioTypes = [
+  //     "audio/mpeg",
+  //     "audio/ogg",
+  //     "audio/wav"
+  //   ];
+
+  //   try {
+  //     // Read file bytes
+  //     List<int> fileBytes = await File(files.path).readAsBytes();
+
+  //     if (validImageTypes.contains(files.type)) {
+  //       setState(() {
+  //         previewUrl = MemoryImage(Uint8List.fromList(fileBytes));
+  //         imagePreviewUrl = files.path;
+  //       });
+  //     } else if (validVideoTypes.contains(files.type)) {
+  //       // Handle video preview
+  //     } else if (validAudioTypes.contains(files.type)) {
+  //       // Handle audio preview
+  //     } else {
+  //       setState(() {
+  //         error = "Invalid file type selected";
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       error = "Error reading file";
+  //     });
+  //   }
+  // }
+
   Future<void> validateFileType(FileType files) async {
-    if (files.path.isEmpty) {
+    print('Validating file type hololo: ${files.type}');
+    if (files == null || files.path.isEmpty) {
       setState(() {
         error = "Empty";
       });
@@ -96,12 +148,19 @@ class _CreatePostState extends State<CreatePost> {
 
     try {
       // Read file bytes
-      List<int> fileBytes = await File(files.path).readAsBytes();
+      List<int> fileBytes;
+
+      if (kIsWeb) {
+        // For web, use the bytes property directly
+        fileBytes = files.path.codeUnits;
+      } else {
+        fileBytes = await File(files.path).readAsBytes();
+      }
 
       if (validImageTypes.contains(files.type)) {
         setState(() {
           previewUrl = MemoryImage(Uint8List.fromList(fileBytes));
-          imagePreviewUrl = null;
+          imagePreviewUrl = files.path;
         });
       } else if (validVideoTypes.contains(files.type)) {
         // Handle video preview
@@ -120,6 +179,7 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Future<void> validateFileTypeWeb(Uint8List bytes) async {
+    print('Validating file type for web: ${files.type}');
     const List<String> validImageTypes = [
       "image/jpeg",
       "image/png",
@@ -140,6 +200,7 @@ class _CreatePostState extends State<CreatePost> {
       setState(() {
         previewUrl = MemoryImage(bytes);
         imagePreviewUrl = null;
+        print('Checking the previewUrl: ${previewUrl}');
       });
     } else if (validVideoTypes.contains(files.type)) {
       // Handle video preview
@@ -152,13 +213,43 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 
+  // Future<void> handleDrop() async {
+  //   FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+  //   if (result != null) {
+  //     setState(() {
+  //       files = FileType(
+  //         path: kIsWeb ? "" : result.files.single.path ?? "", // Handle web case
+  //         lastModified: DateTime.now().millisecondsSinceEpoch,
+  //         lastModifiedDate: DateTime.now(),
+  //         name: result.files.single.name,
+  //         size: result.files.single.size,
+  //         type: lookupMimeType(result.files.single.name) ?? "",
+  //         webkitRelativePath: "",
+  //       );
+  //       error = "";
+  //       imagePreviewUrl = null;
+  //     });
+
+  //     Future.delayed(Duration(milliseconds: 50), () async {
+  //       if (kIsWeb) {
+  //         // For web, use the bytes property
+  //         validateFileTypeWeb(result.files.single.bytes!);
+  //       } else {
+  //         // For other platforms, use the path property
+  //         validateFileType(files);
+  //       }
+  //     });
+  //   }
+  // }
+
   Future<void> handleDrop() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       setState(() {
         files = FileType(
-          path: "", // Leave it empty for web
+          path: kIsWeb ? "" : result.files.single.path ?? "",
           lastModified: DateTime.now().millisecondsSinceEpoch,
           lastModifiedDate: DateTime.now(),
           name: result.files.single.name,
@@ -170,22 +261,29 @@ class _CreatePostState extends State<CreatePost> {
         imagePreviewUrl = null;
       });
 
-      Future.delayed(Duration(milliseconds: 50), () {
-        validateFileType(files);
+      print(
+          'File type: ${files?.type}'); // Use the safe navigation operator (?)
+      print(
+          'File path: ${files?.path}'); // Use the safe navigation operator (?)
+
+      Future.delayed(Duration(milliseconds: 50), () async {
+        if (kIsWeb) {
+          if (result?.files.single.bytes != null) {
+            validateFileTypeWeb(result!.files.single.bytes!);
+          } else {
+            print('Error: Bytes property is null on the web.');
+          }
+        } else {
+          validateFileType(files); // Pass the files object to the method
+        }
       });
     }
   }
 
-  // void handleChange(String value) {
-  //   postController.text = value;
-  // }
-
   void handleChange(String value) {
-    print('Before setState: $post');
     setState(() {
       post = value;
     });
-    print('After setState: $post');
   }
 
   void handleImage() {
@@ -259,7 +357,7 @@ class _CreatePostState extends State<CreatePost> {
 
       final formData = http.MultipartRequest(
         'POST',
-        Uri.parse('http://mentspac.com:8000/api/posts'),
+        Uri.parse('http://localhost:8000/api/posts'),
       );
 
       formData.fields.addAll({
@@ -268,10 +366,41 @@ class _CreatePostState extends State<CreatePost> {
       });
 
       // Add media file if selected
-      if (files.path.isNotEmpty) {
-        File file = File(files.path);
+      // if (files.path.isNotEmpty) {
+      //   File file = File(files.path);
+      //   List<int> fileBytes = await file.readAsBytes();
+      //   String fieldName = 'post_image';
+
+      //   if (isImage == "image") {
+      //     fieldName = 'post_image';
+      //   } else if (isImage == "video") {
+      //     fieldName = 'post_video';
+      //   } else if (isImage == "audio") {
+      //     fieldName = 'post_audio';
+      //   } else {
+      //     // Handle other cases if needed
+      //     return;
+      //   }
+
+      //   // Add the file as bytes to the form data
+      //   // formData.files.add(
+      //   //   http.MultipartFile.fromBytes(fieldName, fileBytes,
+      //   //       filename: files.name),
+      //   // );
+      //   formData.files.add(
+      //     http.MultipartFile.fromBytes(
+      //       fieldName,
+      //       fileBytes,
+      //       filename: 'post_image.${files.type.split('/').last}',
+      //     ),
+      //   );
+      // }
+
+      if (files?.path.isNotEmpty == true) {
+        print('File path: ${files?.path}');
+        File file = File(files?.path ?? "");
         List<int> fileBytes = await file.readAsBytes();
-        String fieldName;
+        String fieldName = 'post_image';
 
         if (isImage == "image") {
           fieldName = 'post_image';
@@ -286,9 +415,13 @@ class _CreatePostState extends State<CreatePost> {
 
         // Add the file as bytes to the form data
         formData.files.add(
-          http.MultipartFile.fromBytes(fieldName, fileBytes,
-              filename: files.name),
+          http.MultipartFile.fromBytes(
+            fieldName,
+            fileBytes,
+            filename: 'post_$isImage.${files.type.split('/').last}',
+          ),
         );
+        print('Added file to formData: ${formData.files}');
       }
 
       // Set authorization header

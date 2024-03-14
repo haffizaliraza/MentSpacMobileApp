@@ -7,7 +7,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:chewie/chewie.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -96,7 +96,7 @@ class _SinglePostState extends State<SinglePost> {
   late bool isLoadingComment;
 
   ChewieController? _chewieController;
-  AudioPlayer? _audioPlayer;
+  // AudioPlayer? _audioPlayer;
 
   Future<void> createComment() async {
     setState(() {
@@ -109,7 +109,7 @@ class _SinglePostState extends State<SinglePost> {
       Map<String, dynamic> tokenMap = json.decode(tokenString);
       String? authToken = tokenMap['auth_token'];
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com:8000/api/comments';
+        final apiUrl = 'http://localhost:8000/api/comments';
 
         // Replace 'YOUR_ACCESS_TOKEN' with the actual access token or authentication mechanism you are using
         final headers = {
@@ -192,9 +192,9 @@ class _SinglePostState extends State<SinglePost> {
     }
 
     // Initialize audio player if there is an audio URL
-    if (postData.post_audio != null && postData.post_audio.isNotEmpty) {
-      _initializeAudioPlayer();
-    }
+    // if (postData.post_audio != null && postData.post_audio.isNotEmpty) {
+    //   _initializeAudioPlayer();
+    // }
 
     commentController.text = content;
   }
@@ -242,7 +242,7 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com:8000/api/comments/$deleteId';
+        final apiUrl = 'http://localhost:8000/api/comments/$deleteId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -340,7 +340,7 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://mentspac.com:8000/api/comments/$updateId';
+        final apiUrl = 'http://localhost:8000/api/comments/$updateId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -429,16 +429,16 @@ class _SinglePostState extends State<SinglePost> {
     );
   }
 
-  void _initializeAudioPlayer() {
-    _audioPlayer = AudioPlayer();
-    // _audioPlayer?.setUrl(postData.post_audio ?? '');
-  }
+  // void _initializeAudioPlayer() {
+  //   _audioPlayer = AudioPlayer();
+  //   // _audioPlayer?.setUrl(postData.post_audio ?? '');
+  // }
 
   @override
   void dispose() {
     // Dispose video and audio players
     _chewieController?.dispose();
-    _audioPlayer?.dispose();
+    // _audioPlayer?.dispose();
     super.dispose();
   }
 
@@ -458,15 +458,17 @@ class _SinglePostState extends State<SinglePost> {
       return Chewie(
         controller: _chewieController!,
       );
-    } else if (_audioPlayer != null) {
-      // Display audio player
-      return IconButton(
-        icon: Icon(Icons.play_arrow),
-        onPressed: () {
-          _audioPlayer?.play(UrlSource(postData.post_audio));
-        },
-      );
-    } else {
+    }
+    //  else if (_audioPlayer != null) {
+    //   // Display audio player
+    //   return IconButton(
+    //     icon: Icon(Icons.play_arrow),
+    //     onPressed: () {
+    //       // _audioPlayer?.play(UrlSource(postData.post_audio));
+    //     },
+    //   );
+    // }
+    else {
       return Container(); // No media content
     }
   }
@@ -725,9 +727,9 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrlPin = 'http://mentspac.com:8000/api/pin';
+        final apiUrlPin = 'http://localhost:8000/api/pin';
         final apiUrlUnPin =
-            'http://mentspac.com:8000/api/pin/${postData.pinned_id}';
+            'http://localhost:8000/api/pin/${postData.pinned_id}';
 
         final headers = {
           'Authorization': 'Token $authToken',

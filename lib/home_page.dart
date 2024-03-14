@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:my_flutter_app/allGroups_page.dart';
+import 'package:my_flutter_app/category_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
+import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_page.dart';
 import 'about_page.dart';
@@ -45,56 +48,79 @@ class LandingPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Navigate to About Page
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AboutPage()));
-              },
-              child: Text(
-                'About',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                height: 100,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.teal[100],
+                  ),
+                  child: Text(
+                    'MentSpac',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Navigate to Careers Page
-                // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => CareersPage()));
-              },
-              child: Text(
-                'Careers',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+              ListTile(
+                title: Text('About'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AboutPage()),
+                  );
+                },
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomeFeeds()));
-              },
-              child: Text(
-                'HomeFeed',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+              ListTile(
+                title: Text('Home Feed'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeFeeds()),
+                  );
+                },
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                // Handle logout
-                signUserOut(context);
-              },
-              icon: Icon(Icons.logout),
-            ),
-            // Add buttons for About and Careers pages
-          ],
+              ListTile(
+                title: Text('Category'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CategoryPage()),
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Users'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UsersList()),
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Groups'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AllGroups()),
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Logout'),
+                onTap: () {
+                  signUserOut(context);
+                },
+              ),
+            ],
+          ),
         ),
         body: SingleChildScrollView(
           child: Column(

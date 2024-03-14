@@ -33,7 +33,7 @@ class _RegisterState extends State<Register> {
   bool isLoading = false;
 
   Future<void> registerUser(BuildContext context) async {
-    final String apiUrl = 'http://mentspac.com:8000/api/auth/register';
+    final String apiUrl = 'http://localhost:8000/api/auth/register';
 
     // Reset validation errors
     setState(() {

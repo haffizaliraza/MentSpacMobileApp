@@ -1,18 +1,82 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/category_page.dart';
 import 'register_page.dart';
 import 'package:http/http.dart' as http;
-import 'home_page.dart';
+// import 'home_page.dart';
 import 'forgotPassword_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'user_token.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
 
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await _googleSignIn.signIn();
+
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+
+        final UserCredential authResult =
+            await _auth.signInWithCredential(credential);
+        final User? user = authResult.user;
+
+        if (user != null) {
+          // Successful Google sign-in
+          print('Google sign-in successful! User: ${user.displayName}');
+
+          // Show a snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Google Sign-In Successful!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // TODO: Implement your logic after successful sign-in
+        } else {
+          // Google sign-in failed
+          print('Google sign-in failed');
+
+          // Show a snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Google Sign-In Failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (error) {
+      // Handle errors
+      print('Error during Google sign-in: $error');
+
+      // Show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error during Google Sign-In. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> loginUser(
       String email, String password, BuildContext context) async {
-    final String apiUrl = 'http://mentspac.com:8000/api/auth/login';
+    final String apiUrl = 'http://localhost:8000/api/auth/login';
 
     try {
       final response = await http.post(
@@ -32,7 +96,7 @@ class LoginPage extends StatelessWidget {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LandingPage()),
+          MaterialPageRoute(builder: (context) => CategoryPage()),
         );
       } else {
         print('Login Failed');
@@ -220,7 +284,7 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      print('Pressed Login with google');
+                      signInWithGoogle(context);
                     },
                     style: ButtonStyle(
                       backgroundColor:

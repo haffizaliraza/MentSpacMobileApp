@@ -1,7 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_flutter_app/about_page.dart';
+import 'package:my_flutter_app/allGroups_page.dart';
+import 'package:my_flutter_app/category_page.dart';
+import 'package:my_flutter_app/home_page.dart';
+import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/singlePost_page.dart';
+import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'createPost_page.dart';
 
@@ -48,7 +54,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
         // Use authToken instead of tokenString in the Authorization header
         final url = Uri.parse(
-            'http://mentspac.com:8000/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
+            'http://localhost:8000/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
         try {
           final response = await http.get(url, headers: {
             'Authorization': 'Token $authToken',
@@ -145,9 +151,110 @@ class _HomeFeedsState extends State<HomeFeeds> {
     }
   }
 
+  void signUserOut(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+
+    // Print statements for debugging
+    print('Token removed from local storage');
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+
+    // Print statement for debugging
+    print('Navigation to login screen executed');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('HomeFeed Page'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Container(
+              height: 100, // Adjust the height as needed
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.teal[100],
+                ),
+                child: Text(
+                  'MentSpac',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('About'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Mentspac'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LandingPage()),
+                );
+              },
+            ),
+            // ListTile(
+            //   title: Text('Home Feed'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => HomeFeeds()),
+            //     );
+            //   },
+            // ),
+            ListTile(
+              title: Text('Category'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CategoryPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Users'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UsersList()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Groups'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AllGroups()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: () {
+                signUserOut(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Container(

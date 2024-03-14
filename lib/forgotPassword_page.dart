@@ -12,7 +12,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   TextEditingController emailController = TextEditingController();
 
   // Future<void> handleForgetPassword() async {
-  //   final String apiUrl = 'http://mentspac.com:8000/api/forgot-password';
+  //   final String apiUrl = 'http://localhost:8000/api/forgot-password';
 
   //   // Validate email
   //   if (emailController.text.isEmpty) {
@@ -47,7 +47,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   // }
 
   Future<void> handleForgetPassword() async {
-    final String apiUrl = 'http://mentspac.com:8000/api/forgot-password';
+    final String apiUrl = 'http://localhost:8000/api/forgot-password';
 
     // Validate email
     if (emailController.text.isEmpty) {
