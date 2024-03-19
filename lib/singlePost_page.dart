@@ -100,7 +100,7 @@ class _SinglePostState extends State<SinglePost> {
 
   Future<void> createComment() async {
     setState(() {
-      isLoadingComment = true; // Set loading indicator to true
+      isLoadingComment = true;
     });
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -111,13 +111,11 @@ class _SinglePostState extends State<SinglePost> {
       if (authToken != null) {
         final apiUrl = 'http://localhost:8000/api/comments';
 
-        // Replace 'YOUR_ACCESS_TOKEN' with the actual access token or authentication mechanism you are using
         final headers = {
           'Authorization': 'Token $authToken',
           'Content-Type': 'application/json',
         };
 
-        // Replace with the actual parameters you need to send in the request
         final body = {
           'comment_content': content,
           'comment_post': postData.id.toString(),
@@ -133,7 +131,6 @@ class _SinglePostState extends State<SinglePost> {
           if (response.statusCode == 201) {
             Map<String, dynamic> commentData = json.decode(response.body);
 
-            // Create a new comment object from the response
             dynamic newComment = {
               'id': commentData['id'],
               'comment_owner': commentData['comment_owner'],
@@ -143,7 +140,6 @@ class _SinglePostState extends State<SinglePost> {
               'comment_post': commentData['comment_post'],
             };
 
-            // Update the local state to include the new comment
             setState(() {
               isSuccessComment = true;
               content = '';
@@ -152,18 +148,16 @@ class _SinglePostState extends State<SinglePost> {
             showToast('Comment posted successfully');
             commentController.clear();
           } else {
-            // Handle other response statuses or errors
             print(
                 'Error creating comment. Status code: ${response.statusCode}');
             showToast('Error creating comment');
           }
         } catch (error) {
-          // Handle any exceptions during the API call
           print('Error creating comment: $error');
           showToast('Error creating comment');
         } finally {
           setState(() {
-            isLoadingComment = false; // Set loading indicator to false
+            isLoadingComment = false;
           });
         }
       }
@@ -216,14 +210,6 @@ class _SinglePostState extends State<SinglePost> {
     });
   }
 
-  // void handleEdit(int id, String content) {
-  //   setState(() {
-  //     commentId = id;
-  //     this.content = content;
-  //     AuthActions.setEditValue(true);
-  //   });
-  // }
-
   void handleEdit(int id, String content) {
     setState(() {
       commentId = id;
@@ -255,14 +241,11 @@ class _SinglePostState extends State<SinglePost> {
           );
 
           if (response.statusCode == 204) {
-            // Comment deleted successfully
-            // Update the local state to remove the deleted comment
             setState(() {
               postData.comments
                   .removeWhere((comment) => comment['id'] == deleteId);
             });
 
-            // Show a success dialog
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -281,11 +264,9 @@ class _SinglePostState extends State<SinglePost> {
               },
             );
           } else {
-            // Handle other response statuses or errors
             print(
                 'Error deleting comment. Status code: ${response.statusCode}');
 
-            // Show an error dialog
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -305,10 +286,8 @@ class _SinglePostState extends State<SinglePost> {
             );
           }
         } catch (error) {
-          // Handle any exceptions during the API call
           print('Error deleting comment: $error');
 
-          // Show an error dialog
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -359,9 +338,8 @@ class _SinglePostState extends State<SinglePost> {
           );
 
           if (response.statusCode == 200) {
-            // Comment updated successfully
+            print('here in handleUpdate success');
 
-            // Update the local state to reflect the changes
             setState(() {
               final updatedComment = postData.comments
                   .firstWhere((comment) => comment['id'] == updateId);
@@ -403,7 +381,6 @@ class _SinglePostState extends State<SinglePost> {
   }
 
   Future<void> handleSubmit() async {
-    // Call the createComment method when the submit button is pressed
     await createComment();
   }
 
@@ -454,9 +431,16 @@ class _SinglePostState extends State<SinglePost> {
         },
       );
     } else if (_chewieController != null) {
-      // Display video player
-      return Chewie(
-        controller: _chewieController!,
+      // Calculate the height based on the aspect ratio of the video
+      double aspectRatio =
+          _chewieController!.videoPlayerController.value.aspectRatio;
+      double videoHeight = 300 / aspectRatio; // Adjust width as needed
+      // Display video player with calculated height
+      return SizedBox(
+        height: videoHeight,
+        child: Chewie(
+          controller: _chewieController!,
+        ),
       );
     }
     //  else if (_audioPlayer != null) {
@@ -469,9 +453,40 @@ class _SinglePostState extends State<SinglePost> {
     //   );
     // }
     else {
-      return Container(); // No media content
+      return Container();
     }
   }
+
+  // Widget renderMediaContent() {
+  //   if (postData.post_image != null && postData.post_image.isNotEmpty) {
+  //     return Image.network(
+  //       postData.post_image,
+  //       width: 300,
+  //       height: 200,
+  //       errorBuilder: (context, error, stackTrace) {
+  //         // Handle error (e.g., display a placeholder image)
+  //         return const Placeholder();
+  //       },
+  //     );
+  //   } else if (_chewieController != null) {
+  //     // Display video player
+  //     return Chewie(
+  //       controller: _chewieController!,
+  //     );
+  //   }
+  //   //  else if (_audioPlayer != null) {
+  //   //   // Display audio player
+  //   //   return IconButton(
+  //   //     icon: Icon(Icons.play_arrow),
+  //   //     onPressed: () {
+  //   //       // _audioPlayer?.play(UrlSource(postData.post_audio));
+  //   //     },
+  //   //   );
+  //   // }
+  //   else {
+  //     return Container();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -571,34 +586,36 @@ class _SinglePostState extends State<SinglePost> {
               ),
             ],
           ),
+
           if (open)
             Column(
               children: [
                 if (commentId == 0)
-                  Form(
-                    key: GlobalKey<FormState>(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: commentController,
-                            onChanged: handleChange,
-                            initialValue: isEditingComment ? content : null,
-                            decoration: InputDecoration(
-                              hintText: 'Enter your comment',
-                            ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: commentController,
+                          onChanged: (value) {
+                            setState(() {
+                              content = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Enter your comment',
                           ),
                         ),
-                        ElevatedButton(
-                          onPressed: content.isEmpty
-                              ? null
-                              : (isEditingComment
-                                  ? () => handleUpdate(commentId)
-                                  : handleSubmit),
-                          child: Text(isEditingComment ? 'Update' : 'Create'),
-                        ),
-                      ],
-                    ),
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            content.trim().isEmpty // Check trimmed content
+                                ? null
+                                : (isEditingComment
+                                    ? () => handleUpdate(commentId)
+                                    : handleSubmit),
+                        child: Text(isEditingComment ? 'Update' : 'Create'),
+                      ),
+                    ],
                   ),
                 if (comments.isNotEmpty)
                   Column(
@@ -615,7 +632,7 @@ class _SinglePostState extends State<SinglePost> {
                                         radius: 20,
                                         backgroundImage: NetworkImage(
                                           comment?['comment_owner']
-                                                  ?["user_image"] ??
+                                                  ["user_image"] ??
                                               '',
                                         ),
                                       )
@@ -670,7 +687,6 @@ class _SinglePostState extends State<SinglePost> {
                                             ? null
                                             : (() =>
                                                 handleUpdate(comment['id'])),
-                                        // : (() => handleUpdate(commentId)),
                                         child: Text('Update'),
                                       ),
                                     Icon(Icons.thumb_up),
@@ -699,7 +715,7 @@ class _SinglePostState extends State<SinglePost> {
                   ),
                 if (comments.isEmpty)
                   Text(
-                    'No comments yet.', // You can customize this message
+                    'No comments yet.',
                     style: TextStyle(
                       color: Colors.grey,
                     ),
@@ -738,33 +754,22 @@ class _SinglePostState extends State<SinglePost> {
 
         try {
           if (postData.is_pinned) {
-            // If post is already pinned, send a DELETE request to unpin it
             final response = await http.delete(
               Uri.parse(apiUrlUnPin),
               headers: headers,
             );
 
             if (response.statusCode == 204) {
-              // Post unpinned successfully
-              // Update the local state to reflect the changes
+              // Update the is_pinned state of the post directly
               setState(() {
                 postData.is_pinned = !postData.is_pinned;
               });
-              Navigator.popUntil(context, (route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeFeeds(),
-                ),
-              );
             } else {
-              // Handle other response statuses or errors
               print(
                   'Error unpinning post. Status code: ${response.statusCode}');
               showToast('Error unpinning post');
             }
           } else {
-            // If post is not pinned, send a POST request to pin it
             final response = await http.post(
               Uri.parse(apiUrlPin),
               headers: headers,
@@ -776,27 +781,16 @@ class _SinglePostState extends State<SinglePost> {
             );
 
             if (response.statusCode == 201) {
-              // Post pinned successfully
-              // Update the local state to reflect the changes
+              // Update the is_pinned state of the post directly
               setState(() {
                 postData.is_pinned = !postData.is_pinned;
               });
-
-              Navigator.popUntil(context, (route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeFeeds(),
-                ),
-              );
             } else {
-              // Handle other response statuses or errors
               print('Error pinning post. Status code: ${response.statusCode}');
               showToast('Error pinning post');
             }
           }
         } catch (error) {
-          // Handle any exceptions during the API call
           print('Error pinning/unpinning post: $error');
           showToast('Error pinning/unpinning post');
         }
@@ -840,10 +834,7 @@ class ConfirmModal extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // ... Your existing widget tree ...
-
-          // Add a placeholder widget if needed
-          Container(), // Replace this with an appropriate widget
+          Container(),
         ],
       ),
     );

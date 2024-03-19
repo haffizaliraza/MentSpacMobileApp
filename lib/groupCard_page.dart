@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:my_flutter_app/group_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class GroupCard extends StatefulWidget {
-  final dynamic item; // Change from GroupProps to dynamic
+  final dynamic item;
 
   GroupCard({required this.item});
 
@@ -22,7 +23,13 @@ class _GroupCardState extends State<GroupCard> {
     }
 
     void handleNavigate(String id) {
-      Navigator.pushNamed(context, '/group_page', arguments: id);
+      print('hre is id: $id');
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => GroupScreen(groupId: id),
+      //   ),
+      // );
     }
 
     Future<void> handleJoinGroup(int id) async {
@@ -44,9 +51,6 @@ class _GroupCardState extends State<GroupCard> {
             );
 
             if (response.statusCode == 201) {
-              print('i am in join group success');
-
-              // Update the is_joined value
               setState(() {
                 widget.item['is_joined'] = true;
               });
@@ -57,11 +61,7 @@ class _GroupCardState extends State<GroupCard> {
                   duration: Duration(seconds: 2),
                 ),
               );
-
-              // Display a success message (Toast message or any other UI indication)
-              // Example: showToast('Group joined successfully');
             } else {
-              // Handle error cases
               print('Error joining group. Status code: ${response.statusCode}');
             }
           } else {
@@ -71,13 +71,11 @@ class _GroupCardState extends State<GroupCard> {
           print('Token string is null');
         }
       } catch (error) {
-        // Handle network or other errors
         print('Error joining group: $error');
       }
     }
 
     return Container(
-      width: double.infinity,
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
         border: Border.all(
@@ -102,7 +100,7 @@ class _GroupCardState extends State<GroupCard> {
             child: Image.network(
               widget.item['group_icon'],
               width: double.infinity,
-              height: 180,
+              height: 150,
               fit: BoxFit.cover,
             ),
           ),
@@ -114,30 +112,32 @@ class _GroupCardState extends State<GroupCard> {
                 Text(
                   widget.item['group_name'],
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(
                       Icons.calendar_today,
-                      size: 16,
+                      size: 14,
                       color: Colors.grey,
                     ),
                     SizedBox(width: 4),
                     Text(
                       convertIsoToDate(widget.item['date_created']),
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 8),
                 Text(
                   widget.item['group_desc'],
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -149,7 +149,7 @@ class _GroupCardState extends State<GroupCard> {
             child: ElevatedButton(
               onPressed: () {
                 widget.item['is_joined']
-                    ? handleNavigate(widget.item['id'])
+                    ? handleNavigate(widget.item['id'].toString())
                     : handleJoinGroup(widget.item['id']);
               },
               style: ElevatedButton.styleFrom(
@@ -159,6 +159,7 @@ class _GroupCardState extends State<GroupCard> {
               ),
               child: Text(
                 widget.item['is_joined'] ? 'View Group' : 'Join Group',
+                style: TextStyle(fontSize: 14),
               ),
             ),
           ),

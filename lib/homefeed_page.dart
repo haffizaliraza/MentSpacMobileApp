@@ -267,7 +267,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Home Feed',
+                    'HomeFeed',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -275,23 +275,36 @@ class _HomeFeedsState extends State<HomeFeeds> {
                   ),
                   Row(
                     children: [
-                      ElevatedButton(
-                        onPressed: () => setFilter('trending'),
-                        child: Text('Trending Post'),
-                        // style: ElevatedButton.styleFrom(
-                        //   primary:
-                        //       filter == 'trending' ? Colors.blue : Colors.grey,
-                        // ),
+                      SizedBox(
+                        width: 70,
+                        height: 32, // Adjust height to match your preference
+                        child: ElevatedButton(
+                          onPressed: () => setFilter('trending'),
+                          child: Text(
+                            'Trending',
+                            style: TextStyle(fontSize: 12), // Adjust font size
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8), // Adjust padding
+                          ),
+                        ),
                       ),
                       SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => setFilter('most_recent'),
-                        child: Text('Most Recent Post'),
-                        // style: ElevatedButton.styleFrom(
-                        //   primary: filter == 'most_recent'
-                        //       ? Colors.blue
-                        //       : Colors.grey,
-                        // ),
+                      SizedBox(
+                        width: 100,
+                        height: 32, // Adjust height to match your preference
+                        child: ElevatedButton(
+                          onPressed: () => setFilter('most_recent'),
+                          child: Text(
+                            'Most Recent',
+                            style: TextStyle(fontSize: 12), // Adjust font size
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8), // Adjust padding
+                          ),
+                        ),
                       ),
                     ],
                   ),

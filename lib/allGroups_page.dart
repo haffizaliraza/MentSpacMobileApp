@@ -4,6 +4,7 @@ import 'package:my_flutter_app/about_page.dart';
 import 'package:my_flutter_app/category_page.dart';
 import 'dart:convert';
 import 'package:my_flutter_app/groupCard_page.dart';
+// import 'package:my_flutter_app/group_page.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
@@ -157,222 +158,227 @@ class _AllGroupsState extends State<AllGroups> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('All Groups'),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                height: 100, // Adjust the height as needed
-                child: DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.teal[100],
-                  ),
-                  child: Text(
-                    'MentSpac',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                    ),
+      appBar: AppBar(
+        title: Text('All Groups'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Container(
+              height: 100, // Adjust the height as needed
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.teal[100],
+                ),
+                child: Text(
+                  'MentSpac',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
                   ),
                 ),
               ),
-              ListTile(
-                title: Text('About'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AboutPage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Home Feed'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeFeeds()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Category'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CategoryPage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Users'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UsersList()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Mentspac'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LandingPage()),
-                  );
-                },
-              ),
-              // ListTile(
-              //   title: Text('Groups'),
-              //   onTap: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(builder: (context) => AllGroups()),
-              //     );
-              //   },
-              // ),
-              ListTile(
-                title: Text('Logout'),
-                onTap: () {
-                  signUserOut(context);
-                },
-              ),
-            ],
-          ),
+            ),
+            ListTile(
+              title: Text('About'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Home Feed'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeFeeds()),
+                );
+              },
+            ),
+            // ListTile(
+            //   title: Text('GroupFeed'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => GroupScreen()),
+            //     );
+            //   },
+            // ),
+            ListTile(
+              title: Text('Category'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CategoryPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Users'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UsersList()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Mentspac'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LandingPage()),
+                );
+              },
+            ),
+            // ListTile(
+            //   title: Text('Groups'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => AllGroups()),
+            //     );
+            //   },
+            // ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: () {
+                signUserOut(context);
+              },
+            ),
+          ],
         ),
-        body: isLoading
-            ? CircularProgressIndicator()
-            : SingleChildScrollView(
-                child: Container(
-                  margin: EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        'All Groups (${!filteredData ? categoryGroupData.length : data.length})',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
                         children: [
-                          Text(
-                            'All Groups (${!filteredData ? categoryGroupData.length : data.length})',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: TextFormField(
+                              controller: searchController,
+                              onChanged: (value) {
+                                setState(() {
+                                  searchTerm = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                border: OutlineInputBorder(),
+                              ),
                             ),
                           ),
-                          Row(
-                            children: [
-                              Container(
-                                width: 200, // Adjust the width as needed
-                                child: TextFormField(
-                                  controller: searchController,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      searchTerm = value;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  border: Border.all(),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: IconButton(
-                                  icon: Icon(Icons.search),
-                                  onPressed: filterGroup,
-                                ),
-                              ),
-                            ],
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: filterGroup,
+                            child: Icon(Icons.search),
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
-                      if (categoryGroupData.isNotEmpty &&
-                          data.isEmpty &&
-                          !filteredData)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              'Recommended Groups',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    ),
+                    SizedBox(height: 20),
+                    if (categoryGroupData.isNotEmpty &&
+                        data.isEmpty &&
+                        !filteredData)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Recommended Groups',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            SizedBox(height: 10),
-                            Container(
-                              child: GridView.builder(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 1,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                ),
-                                itemCount: categoryGroupData.length,
-                                shrinkWrap: true,
-                                physics: ScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  print('index data ${index}');
-                                  return GroupCard(
-                                    item: categoryGroupData[index],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (filteredData && data.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              'Search Result',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            GridView.builder(
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            child: GridView.builder(
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 1,
                                 crossAxisSpacing: 8,
                                 mainAxisSpacing: 8,
                               ),
-                              itemCount: data.length,
+                              itemCount: categoryGroupData.length,
                               shrinkWrap: true,
+                              physics: ScrollPhysics(),
                               itemBuilder: (context, index) {
+                                print('index data ${index}');
                                 return GroupCard(
-                                  item: data[index],
+                                  item: categoryGroupData[index],
                                 );
                               },
                             ),
-                          ],
-                        ),
-                      if (!filteredData &&
-                          data.isEmpty &&
-                          categoryGroupData.isEmpty)
-                        Text(
-                          'No Group Found',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
                           ),
+                        ],
+                      ),
+                    if (filteredData && data.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Search Result',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                            ),
+                            itemCount: data.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return GroupCard(
+                                item: data[index],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    if (!filteredData &&
+                        data.isEmpty &&
+                        categoryGroupData.isEmpty)
+                      Text(
+                        'No Group Found',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
-              ));
+              ),
+            ),
+    );
   }
 }
 

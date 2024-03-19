@@ -67,59 +67,9 @@ class _CreatePostState extends State<CreatePost> {
   @override
   void initState() {
     super.initState();
-    // Fetch the id using whatever logic you have
-    // For now, assigning a placeholder value
+
     id = "some_id";
   }
-
-  // Future<void> validateFileType(FileType files) async {
-  //   if (files.path.isEmpty) {
-  //     setState(() {
-  //       error = "Empty";
-  //     });
-  //     return;
-  //   }
-
-  //   const List<String> validImageTypes = [
-  //     "image/jpeg",
-  //     "image/png",
-  //     "image/gif"
-  //   ];
-  //   const List<String> validVideoTypes = [
-  //     "video/mp4",
-  //     "video/mpeg",
-  //     "video/webm"
-  //   ];
-  //   const List<String> validAudioTypes = [
-  //     "audio/mpeg",
-  //     "audio/ogg",
-  //     "audio/wav"
-  //   ];
-
-  //   try {
-  //     // Read file bytes
-  //     List<int> fileBytes = await File(files.path).readAsBytes();
-
-  //     if (validImageTypes.contains(files.type)) {
-  //       setState(() {
-  //         previewUrl = MemoryImage(Uint8List.fromList(fileBytes));
-  //         imagePreviewUrl = files.path;
-  //       });
-  //     } else if (validVideoTypes.contains(files.type)) {
-  //       // Handle video preview
-  //     } else if (validAudioTypes.contains(files.type)) {
-  //       // Handle audio preview
-  //     } else {
-  //       setState(() {
-  //         error = "Invalid file type selected";
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       error = "Error reading file";
-  //     });
-  //   }
-  // }
 
   Future<void> validateFileType(FileType files) async {
     print('Validating file type hololo: ${files.type}');
@@ -212,36 +162,6 @@ class _CreatePostState extends State<CreatePost> {
       });
     }
   }
-
-  // Future<void> handleDrop() async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-  //   if (result != null) {
-  //     setState(() {
-  //       files = FileType(
-  //         path: kIsWeb ? "" : result.files.single.path ?? "", // Handle web case
-  //         lastModified: DateTime.now().millisecondsSinceEpoch,
-  //         lastModifiedDate: DateTime.now(),
-  //         name: result.files.single.name,
-  //         size: result.files.single.size,
-  //         type: lookupMimeType(result.files.single.name) ?? "",
-  //         webkitRelativePath: "",
-  //       );
-  //       error = "";
-  //       imagePreviewUrl = null;
-  //     });
-
-  //     Future.delayed(Duration(milliseconds: 50), () async {
-  //       if (kIsWeb) {
-  //         // For web, use the bytes property
-  //         validateFileTypeWeb(result.files.single.bytes!);
-  //       } else {
-  //         // For other platforms, use the path property
-  //         validateFileType(files);
-  //       }
-  //     });
-  //   }
-  // }
 
   Future<void> handleDrop() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
