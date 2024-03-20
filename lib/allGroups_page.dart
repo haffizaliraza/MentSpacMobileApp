@@ -285,8 +285,11 @@ class _AllGroupsState extends State<AllGroups> {
                                 });
                               },
                               decoration: InputDecoration(
-                                hintText: 'Search',
+                                hintText: ' Search',
                                 border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical:
+                                        10.0), // Adjust the vertical padding as needed
                               ),
                             ),
                           ),
@@ -298,7 +301,7 @@ class _AllGroupsState extends State<AllGroups> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 40),
                     if (categoryGroupData.isNotEmpty &&
                         data.isEmpty &&
                         !filteredData)

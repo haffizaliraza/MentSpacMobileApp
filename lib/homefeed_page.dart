@@ -336,7 +336,11 @@ class _HomeFeedsState extends State<HomeFeeds> {
                       ],
               ),
               SizedBox(height: 16),
-              isLoading ? CircularProgressIndicator() : Container(),
+              isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container(),
             ],
           ),
         ),

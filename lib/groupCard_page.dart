@@ -24,12 +24,12 @@ class _GroupCardState extends State<GroupCard> {
 
     void handleNavigate(String id) {
       print('hre is id: $id');
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => GroupScreen(groupId: id),
-      //   ),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupScreen(groupId: id),
+        ),
+      );
     }
 
     Future<void> handleJoinGroup(int id) async {
@@ -75,21 +75,10 @@ class _GroupCardState extends State<GroupCard> {
       }
     }
 
-    return Container(
+    return Card(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 2,
-          color: Colors.grey[300]!,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
+      elevation: 4,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -112,31 +101,31 @@ class _GroupCardState extends State<GroupCard> {
                 Text(
                   widget.item['group_name'],
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Icon(
                       Icons.calendar_today,
-                      size: 14,
+                      size: 16,
                       color: Colors.grey,
                     ),
                     SizedBox(width: 4),
                     Text(
                       convertIsoToDate(widget.item['date_created']),
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),
                 SizedBox(height: 8),
                 Text(
                   widget.item['group_desc'],
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                  maxLines: 2,
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -144,8 +133,7 @@ class _GroupCardState extends State<GroupCard> {
           ),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16),
-            color: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: ElevatedButton(
               onPressed: () {
                 widget.item['is_joined']
@@ -156,10 +144,18 @@ class _GroupCardState extends State<GroupCard> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
+                backgroundColor: widget.item['is_joined']
+                    ? Color.fromARGB(
+                        255, 23, 124, 218) // Change color for "View Group"
+                    : Colors.blue, // Change color for "Join Group"
               ),
               child: Text(
                 widget.item['is_joined'] ? 'View Group' : 'Join Group',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // Text color is set to white
+                ),
               ),
             ),
           ),
