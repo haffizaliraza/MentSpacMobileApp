@@ -76,7 +76,7 @@ class _GroupCardState extends State<GroupCard> {
     }
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -84,14 +84,28 @@ class _GroupCardState extends State<GroupCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.network(
-              widget.item['group_icon'],
-              width: double.infinity,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.network(
+                  widget.item['group_icon'],
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(Icons.favorite_border),
+                  onPressed: () {
+                    // Handle favorite action
+                  },
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -101,7 +115,7 @@ class _GroupCardState extends State<GroupCard> {
                 Text(
                   widget.item['group_name'],
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
@@ -128,35 +142,35 @@ class _GroupCardState extends State<GroupCard> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.item['is_joined']
+                        ? handleNavigate(widget.item['id'].toString())
+                        : handleJoinGroup(widget.item['id']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widget.item['is_joined']
+                        ? Color(0xFF177CDA) // View Group button color
+                        : Colors.blue, // Join Group button color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
+                    child: Text(
+                      widget.item['is_joined'] ? 'View Group' : 'Join Group',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ],
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: ElevatedButton(
-              onPressed: () {
-                widget.item['is_joined']
-                    ? handleNavigate(widget.item['id'].toString())
-                    : handleJoinGroup(widget.item['id']);
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                backgroundColor: widget.item['is_joined']
-                    ? Color.fromARGB(
-                        255, 23, 124, 218) // Change color for "View Group"
-                    : Colors.blue, // Change color for "Join Group"
-              ),
-              child: Text(
-                widget.item['is_joined'] ? 'View Group' : 'Join Group',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // Text color is set to white
-                ),
-              ),
             ),
           ),
         ],

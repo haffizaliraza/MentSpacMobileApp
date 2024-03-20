@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:my_flutter_app/usersList_page.dart';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +8,6 @@ typedef void UpdateCallback(bool success);
 
 class UserCard extends StatelessWidget {
   final Map<String, dynamic> item;
-
   final UpdateCallback updateCallback;
 
   UserCard({required this.item, required this.updateCallback});
@@ -23,8 +21,6 @@ class UserCard extends StatelessWidget {
     final isBlocked = item['is_blocked'];
     final isFollowed = item['is_followed'];
     final userId = item['id'];
-
-    print('user image here ${userImage}');
 
     Future<void> toggleBlockUser(int userId, bool block) async {
       try {
@@ -49,8 +45,6 @@ class UserCard extends StatelessWidget {
             );
 
             if (response.statusCode == 200 || response.statusCode == 201) {
-              // Successfully blocked or unblocked the user
-              // You can update the UI or show a success message
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(block
@@ -62,7 +56,6 @@ class UserCard extends StatelessWidget {
 
               updateCallback(true);
             } else {
-              // Handle error
               print(
                   'Error toggling block user. Status code: ${response.statusCode}');
               print('Response body: ${response.body}');
@@ -70,7 +63,6 @@ class UserCard extends StatelessWidget {
           }
         }
       } catch (error) {
-        // Handle error
         print('Error toggling block user: $error');
       }
     }
@@ -98,8 +90,6 @@ class UserCard extends StatelessWidget {
             );
 
             if (response.statusCode == 200 || response.statusCode == 201) {
-              // Successfully followed or unfollowed the user
-              // You can update the UI or show a success message
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(follow
@@ -110,38 +100,38 @@ class UserCard extends StatelessWidget {
               );
               updateCallback(true);
             } else {
-              // Handle error
               print('Error toggling follow user: ${response.statusCode}');
             }
           }
         }
       } catch (error) {
-        // Handle error
         print('Error toggling follow user: $error');
       }
     }
 
     return Card(
       margin: EdgeInsets.all(8),
-      elevation: 8, // Add elevation for a shadow effect
+      elevation: 8,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15), // Rounded corners
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.blueGrey, // Add a border around the image
-                  width: 2,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.blueGrey,
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: ClipOval(
                 child: userImage != ''
                     ? Image.network(
                         userImage,
@@ -156,43 +146,60 @@ class UserCard extends StatelessWidget {
                       ),
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              '$postUsername${showAddress && city != null ? ' (From $city)' : ''}',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$postUsername${showAddress && city != null ? ' (From $city)' : ''}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            SizedBox(width: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () async {
                     await toggleBlockUser(userId, !isBlocked);
                   },
                   style: ElevatedButton.styleFrom(
-                    // primary: isBlocked ? Colors.green : Colors.red,
+                    backgroundColor: Colors.red[400],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text(isBlocked ? 'Unblock' : 'Block'),
+                  child: Text(
+                    isBlocked ? 'Unblock' : 'Block',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
+                SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () async {
                     await toggleFollowUser(userId, !isFollowed);
                   },
                   style: ElevatedButton.styleFrom(
-                    // primary: isFollowed ? Colors.green : Colors.blue,
+                    backgroundColor: Colors.blue[400],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text(isFollowed ? 'Unfollow' : 'Follow'),
+                  child: Text(
+                    isFollowed ? 'Unfollow' : 'Follow',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
