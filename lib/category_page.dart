@@ -306,7 +306,9 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
       body: isLoading
-          ? CircularProgressIndicator()
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
           : Container(
               padding: EdgeInsets.all(16),
               child: Column(
