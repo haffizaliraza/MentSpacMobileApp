@@ -258,7 +258,7 @@ class _AllGroupsState extends State<AllGroups> {
             )
           : SingleChildScrollView(
               child: Container(
-                margin: EdgeInsets.all(12),
+                margin: EdgeInsets.all(2),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -301,7 +301,7 @@ class _AllGroupsState extends State<AllGroups> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: 30),
                     if (categoryGroupData.isNotEmpty &&
                         data.isEmpty &&
                         !filteredData)
@@ -321,8 +321,8 @@ class _AllGroupsState extends State<AllGroups> {
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 1,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
+                                crossAxisSpacing: 32,
+                                mainAxisSpacing: 32,
                               ),
                               itemCount: categoryGroupData.length,
                               shrinkWrap: true,
@@ -353,8 +353,8 @@ class _AllGroupsState extends State<AllGroups> {
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 1,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 32,
+                              mainAxisSpacing: 32,
                             ),
                             itemCount: data.length,
                             shrinkWrap: true,
