@@ -210,15 +210,15 @@ class _GroupScreenState extends State<GroupScreen> {
           padding: EdgeInsets.zero,
           children: [
             Container(
-              height: 100,
+              height: 100, // Adjust the height as needed
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.teal[100],
+                  color: Color(0xFFF1F9FC),
                 ),
                 child: Text(
                   'MentSpac',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 24,
                   ),
                 ),

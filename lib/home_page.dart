@@ -40,7 +40,7 @@ class LandingPage extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.teal[100],
+          backgroundColor: Color.fromARGB(255, 183, 228, 245),
           title: Text(
             'MentSpac',
             style: TextStyle(
@@ -48,79 +48,38 @@ class LandingPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                height: 100,
-                child: DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.teal[100],
-                  ),
-                  child: Text(
-                    'MentSpac',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                    ),
-                  ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Navigate to About Page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AboutPage()));
+              },
+              child: Text(
+                'About',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
-              ListTile(
-                title: Text('About'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AboutPage()),
-                  );
-                },
+            ),
+            TextButton(
+              onPressed: () {
+                // Navigate to About Page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
+              },
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
-              ListTile(
-                title: Text('Home Feed'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeFeeds()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Category'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CategoryPage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Users'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UsersList()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Groups'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AllGroups()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Logout'),
-                onTap: () {
-                  signUserOut(context);
-                },
-              ),
-            ],
-          ),
+            ),
+
+            // Add buttons for About and Careers pages
+          ],
         ),
         body: SingleChildScrollView(
           child: Column(

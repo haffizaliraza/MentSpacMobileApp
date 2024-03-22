@@ -17,6 +17,7 @@ class HomeFeeds extends StatefulWidget {
 }
 
 class _HomeFeedsState extends State<HomeFeeds> {
+  String _selectedFilter = 'most_recent';
   List<dynamic> result = [];
   bool isLoading = true;
   int pageNumber = 1;
@@ -160,7 +161,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => LandingPage()),
     );
 
     // Print statement for debugging
@@ -181,35 +182,18 @@ class _HomeFeedsState extends State<HomeFeeds> {
               height: 100, // Adjust the height as needed
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.teal[100],
+                  color: Color.fromARGB(255, 183, 228, 245),
                 ),
                 child: Text(
                   'MentSpac',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 24,
                   ),
                 ),
               ),
             ),
-            ListTile(
-              title: Text('About'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AboutPage()),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Mentspac'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LandingPage()),
-                );
-              },
-            ),
+
             // ListTile(
             //   title: Text('Home Feed'),
             //   onTap: () {
@@ -277,32 +261,57 @@ class _HomeFeedsState extends State<HomeFeeds> {
                     children: [
                       SizedBox(
                         width: 70,
-                        height: 32, // Adjust height to match your preference
+                        height: 32,
                         child: ElevatedButton(
-                          onPressed: () => setFilter('trending'),
+                          onPressed: () {
+                            setState(() {
+                              _selectedFilter = 'trending';
+                            });
+                            setFilter('trending');
+                          },
                           child: Text(
                             'Trending',
-                            style: TextStyle(fontSize: 12), // Adjust font size
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _selectedFilter == 'trending'
+                                  ? Colors.white
+                                  : null,
+                            ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8), // Adjust padding
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            backgroundColor: _selectedFilter == 'trending'
+                                ? Color.fromARGB(255, 110, 196, 228)
+                                : null,
                           ),
                         ),
                       ),
                       SizedBox(width: 8),
                       SizedBox(
                         width: 100,
-                        height: 32, // Adjust height to match your preference
+                        height: 32,
                         child: ElevatedButton(
-                          onPressed: () => setFilter('most_recent'),
+                          onPressed: () {
+                            setState(() {
+                              _selectedFilter = 'most_recent';
+                            });
+                            setFilter('most_recent');
+                          },
                           child: Text(
                             'Most Recent',
-                            style: TextStyle(fontSize: 12), // Adjust font size
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _selectedFilter == 'most_recent'
+                                  ? Colors.white // Text color when selected
+                                  : null, // Use default text color if not selected
+                            ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8), // Adjust padding
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            backgroundColor: _selectedFilter == 'most_recent'
+                                ? Color.fromARGB(255, 110, 196,
+                                    228) // Highlight color when selected
+                                : null, // Use default color if not selected
                           ),
                         ),
                       ),

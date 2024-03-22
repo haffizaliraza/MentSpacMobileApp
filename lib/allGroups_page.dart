@@ -146,7 +146,7 @@ class _AllGroupsState extends State<AllGroups> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => LandingPage()),
     );
 
     // Print statement for debugging
@@ -169,26 +169,18 @@ class _AllGroupsState extends State<AllGroups> {
               height: 100, // Adjust the height as needed
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.teal[100],
+                  color: Color.fromARGB(255, 183, 228, 245),
                 ),
                 child: Text(
                   'MentSpac',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 24,
                   ),
                 ),
               ),
             ),
-            ListTile(
-              title: Text('About'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AboutPage()),
-                );
-              },
-            ),
+
             ListTile(
               title: Text('Home Feed'),
               onTap: () {
@@ -225,15 +217,7 @@ class _AllGroupsState extends State<AllGroups> {
                 );
               },
             ),
-            ListTile(
-              title: Text('Mentspac'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LandingPage()),
-                );
-              },
-            ),
+
             // ListTile(
             //   title: Text('Groups'),
             //   onTap: () {

@@ -78,7 +78,7 @@ class _GroupCardState extends State<GroupCard> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 44, vertical: 1),
+        margin: EdgeInsets.symmetric(horizontal: 64, vertical: 1),
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

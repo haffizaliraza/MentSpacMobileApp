@@ -492,7 +492,14 @@ class _CreatePostState extends State<CreatePost> {
   Widget _buildActionButtons(
       IconData icon, String label, Function() onPressed) {
     return InkWell(
-      onTap: onPressed,
+      onTap: () {
+        // Call handleDrop directly when tapping on the icon
+        if (label == "Image" || label == "Video" || label == "Audio") {
+          handleDrop();
+        } else {
+          onPressed();
+        }
+      },
       child: Column(
         children: [
           Icon(icon, size: 32),

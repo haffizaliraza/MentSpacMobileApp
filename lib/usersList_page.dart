@@ -117,7 +117,7 @@ class _UsersListState extends State<UsersList> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => LandingPage()),
     );
 
     // Print statement for debugging
@@ -135,29 +135,21 @@ class _UsersListState extends State<UsersList> {
           padding: EdgeInsets.zero,
           children: [
             Container(
-              height: 100,
+              height: 100, // Adjust the height as needed
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.teal[100],
+                  color: Color.fromARGB(255, 183, 228, 245),
                 ),
                 child: Text(
                   'MentSpac',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 24,
                   ),
                 ),
               ),
             ),
-            ListTile(
-              title: Text('About'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AboutPage()),
-                );
-              },
-            ),
+
             ListTile(
               title: Text('Home Feed'),
               onTap: () {
@@ -176,15 +168,7 @@ class _UsersListState extends State<UsersList> {
                 );
               },
             ),
-            ListTile(
-              title: Text('Mentspac'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LandingPage()),
-                );
-              },
-            ),
+
             // ListTile(
             //   title: Text('Users'),
             //   onTap: () {

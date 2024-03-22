@@ -96,6 +96,23 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
   late bool isCreateSuccess;
   late bool isLoading;
   late bool isLoadingComment;
+  late int currentUserId;
+
+  Future<void> getCurrentUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString('token');
+
+    if (userDataString != null) {
+      Map<String, dynamic> userData = json.decode(userDataString);
+      int? userId = userData['id'];
+
+      if (userId != null) {
+        setState(() {
+          currentUserId = userId;
+        });
+      }
+    }
+  }
 
   ChewieController? _chewieController;
   // AudioPlayer? _audioPlayer;
@@ -124,11 +141,23 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
         };
 
         try {
+          showDialog(
+            context: context,
+            barrierDismissible: false, // Prevent user from dismissing dialog
+            builder: (BuildContext context) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+
           final response = await http.post(
             Uri.parse(apiUrl),
             headers: headers,
             body: json.encode(body),
           );
+
+          Navigator.of(context).pop();
 
           if (response.statusCode == 201) {
             Map<String, dynamic> commentData = json.decode(response.body);
@@ -181,6 +210,8 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
     isCreateSuccess = false;
     isLoading = false;
     isLoadingComment = false;
+    currentUserId = 0;
+    getCurrentUserId();
 
     // Initialize video player if there is a video URL
     if (postData.post_video != null && postData.post_video.isNotEmpty) {
@@ -222,91 +253,106 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
   }
 
   Future<void> handleDelete(int deleteId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? tokenString = prefs.getString('token');
-
-    if (tokenString != null) {
-      Map<String, dynamic> tokenMap = json.decode(tokenString);
-      String? authToken = tokenMap['auth_token'];
-
-      if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments/$deleteId';
-
-        final headers = {
-          'Authorization': 'Token $authToken',
-        };
-
-        try {
-          final response = await http.delete(
-            Uri.parse(apiUrl),
-            headers: headers,
-          );
-
-          if (response.statusCode == 204) {
-            setState(() {
-              postData.comments
-                  .removeWhere((comment) => comment['id'] == deleteId);
-            });
-
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Success'),
-                  content: Text('Comment deleted successfully.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
-                    ),
-                  ],
-                );
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to delete this comment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Confirm delete
               },
-            );
-          } else {
-            print(
-                'Error deleting comment. Status code: ${response.statusCode}');
-
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Error'),
-                  content: Text('Failed to delete comment. Please try again.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
-                    ),
-                  ],
-                );
+              child: Text('Delete'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Cancel delete
               },
-            );
-          }
-        } catch (error) {
-          print('Error deleting comment: $error');
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
 
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error'),
-                content: Text('Failed to delete comment. Please try again.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
+    // Proceed with deletion if confirmed
+    if (confirmDelete ?? false) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? tokenString = prefs.getString('token');
+
+      if (tokenString != null) {
+        Map<String, dynamic> tokenMap = json.decode(tokenString);
+        String? authToken = tokenMap['auth_token'];
+
+        if (authToken != null) {
+          final apiUrl = 'http://localhost:8000/api/comments/$deleteId';
+
+          final headers = {
+            'Authorization': 'Token $authToken',
+          };
+
+          try {
+            final response = await http.get(
+              Uri.parse(apiUrl),
+              headers: headers,
+            );
+
+            if (response.statusCode == 200) {
+              Map<String, dynamic> commentData = json.decode(response.body);
+
+              int commentOwnerId = commentData['comment_owner']['id'];
+              int currentUserId = tokenMap['id'];
+
+              if (commentOwnerId == currentUserId) {
+                // Proceed with deletion
+                final deleteResponse = await http.delete(
+                  Uri.parse(apiUrl),
+                  headers: headers,
+                );
+
+                if (deleteResponse.statusCode == 204) {
+                  setState(() {
+                    postData.comments
+                        .removeWhere((comment) => comment['id'] == deleteId);
+                  });
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Success'),
+                        content: Text('Comment deleted successfully.'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
                     },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+                  );
+                } else {
+                  print(
+                      'Error deleting comment. Status code: ${deleteResponse.statusCode}');
+                  showToast('Error deleting comment');
+                }
+              } else {
+                // User does not have permission to delete this comment
+                showToast('You can only delete your own comments.');
+              }
+            } else {
+              print(
+                  'Error retrieving comment. Status code: ${response.statusCode}');
+              showToast('Error retrieving comment');
+            }
+          } catch (error) {
+            print('Error deleting comment: $error');
+            showToast('Error deleting comment');
+          }
         }
       }
     }
@@ -619,10 +665,26 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
                       ),
                     ],
                   ),
+                SizedBox(height: 8),
                 if (comments.isNotEmpty)
                   Column(
-                    children: comments
-                        .map((comment) => Column(
+                    children: comments.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final comment = entry.value;
+                      final isEven = index.isEven;
+                      final backgroundColor = isEven
+                          ? Colors.grey[200]
+                          : Colors.grey[300]; // Alternate background colors
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .stretch, // Ensure comments expand horizontally
+                        children: [
+                          Container(
+                            color: backgroundColor, // Apply background color
+                            padding: EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
@@ -643,7 +705,7 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
                                         radius: 20,
                                         child: Icon(Icons.person),
                                       ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: 16),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -672,7 +734,6 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
                                           onChanged: handleChange,
                                           initialValue:
                                               comment['comment_content'],
-                                          // value: content,
                                           decoration: InputDecoration(
                                             hintText: 'Enter your comment',
                                           ),
@@ -687,33 +748,40 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
                                         onPressed: content.isEmpty ||
                                                 commentId != comment['id']
                                             ? null
-                                            : (() =>
-                                                handleUpdate(comment['id'])),
+                                            : () => handleUpdate(comment['id']),
                                         child: Text('Update'),
                                       ),
-                                    Icon(Icons.thumb_up),
                                   ],
                                 ),
                                 SizedBox(height: 8),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.delete),
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.red[400],
+                                      ),
                                       onPressed: () =>
                                           handleDelete(comment['id']),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.edit),
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.blue[400],
+                                      ),
                                       onPressed: () => handleEdit(comment['id'],
                                           comment['comment_content']),
                                     ),
                                   ],
                                 ),
                               ],
-                            ))
-                        .toList(),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                        ],
+                      );
+                    }).toList(),
                   ),
                 if (comments.isEmpty)
                   Text(

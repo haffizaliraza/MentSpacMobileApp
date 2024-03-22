@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/category_page.dart';
+import 'package:my_flutter_app/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_page.dart';
 // import 'home_page.dart';
@@ -13,6 +14,6 @@ void main() async {
   print('Token: $token');
 
   runApp(MaterialApp(
-    home: token != null ? CategoryPage() : LoginPage(),
+    home: token != null ? CategoryPage() : LandingPage(),
   ));
 }
