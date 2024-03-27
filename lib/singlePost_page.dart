@@ -10,6 +10,7 @@ import 'package:chewie/chewie.dart';
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class PostProps {
   final String username;
@@ -126,7 +127,7 @@ class _SinglePostState extends State<SinglePost> {
       Map<String, dynamic> tokenMap = json.decode(tokenString);
       String? authToken = tokenMap['auth_token'];
       if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments';
+        final apiUrl = '${ApiConfig.baseUrl}/api/comments';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -287,7 +288,7 @@ class _SinglePostState extends State<SinglePost> {
         String? authToken = tokenMap['auth_token'];
 
         if (authToken != null) {
-          final apiUrl = 'http://localhost:8000/api/comments/$deleteId';
+          final apiUrl = '${ApiConfig.baseUrl}/api/comments/$deleteId';
 
           final headers = {
             'Authorization': 'Token $authToken',
@@ -367,7 +368,7 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments/$updateId';
+        final apiUrl = '${ApiConfig.baseUrl}/api/comments/$updateId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -444,10 +445,21 @@ class _SinglePostState extends State<SinglePost> {
     );
   }
 
+  // void _initializeVideoPlayer() {
+  //   _chewieController = ChewieController(
+  //     videoPlayerController: VideoPlayerController.network(
+  //       postData.post_video!,
+  //     ),
+  //     autoPlay: false,
+  //     looping: false,
+  //   );
+  // }
+
   void _initializeVideoPlayer() {
+    print('hihihisdxcg ${Uri.parse(postData.post_video!)}');
     _chewieController = ChewieController(
-      videoPlayerController: VideoPlayerController.network(
-        postData.post_video!,
+      videoPlayerController: VideoPlayerController.networkUrl(
+        Uri.parse(postData.post_video!),
       ),
       autoPlay: false,
       looping: false,
@@ -474,16 +486,16 @@ class _SinglePostState extends State<SinglePost> {
         width: 300,
         height: 200,
         errorBuilder: (context, error, stackTrace) {
-          // Handle error (e.g., display a placeholder image)
           return const Placeholder();
         },
       );
     } else if (_chewieController != null) {
-      // Calculate the height based on the aspect ratio of the video
+      print('inside video post render media content');
+
       double aspectRatio =
           _chewieController!.videoPlayerController.value.aspectRatio;
-      double videoHeight = 300 / aspectRatio; // Adjust width as needed
-      // Display video player with calculated height
+      double videoHeight = 300 / aspectRatio;
+
       return SizedBox(
         height: videoHeight,
         child: Chewie(
@@ -504,37 +516,6 @@ class _SinglePostState extends State<SinglePost> {
       return Container();
     }
   }
-
-  // Widget renderMediaContent() {
-  //   if (postData.post_image != null && postData.post_image.isNotEmpty) {
-  //     return Image.network(
-  //       postData.post_image,
-  //       width: 300,
-  //       height: 200,
-  //       errorBuilder: (context, error, stackTrace) {
-  //         // Handle error (e.g., display a placeholder image)
-  //         return const Placeholder();
-  //       },
-  //     );
-  //   } else if (_chewieController != null) {
-  //     // Display video player
-  //     return Chewie(
-  //       controller: _chewieController!,
-  //     );
-  //   }
-  //   //  else if (_audioPlayer != null) {
-  //   //   // Display audio player
-  //   //   return IconButton(
-  //   //     icon: Icon(Icons.play_arrow),
-  //   //     onPressed: () {
-  //   //       // _audioPlayer?.play(UrlSource(postData.post_audio));
-  //   //     },
-  //   //   );
-  //   // }
-  //   else {
-  //     return Container();
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -813,9 +794,9 @@ class _SinglePostState extends State<SinglePost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrlPin = 'http://localhost:8000/api/pin';
+        final apiUrlPin = '${ApiConfig.baseUrl}/api/pin';
         final apiUrlUnPin =
-            'http://localhost:8000/api/pin/${postData.pinned_id}';
+            '${ApiConfig.baseUrl}/api/pin/${postData.pinned_id}';
 
         final headers = {
           'Authorization': 'Token $authToken',

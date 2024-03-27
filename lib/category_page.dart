@@ -7,8 +7,8 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -37,7 +37,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/categories'),
+            Uri.parse('${ApiConfig.baseUrl}/api/categories'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/user/categories'),
+            Uri.parse('${ApiConfig.baseUrl}/api/user/categories'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ class _CategoryPageState extends State<CategoryPage> {
         if (authToken != null) {
           final request = http.MultipartRequest(
             'POST',
-            Uri.parse('http://localhost:8000/api/user/categories'),
+            Uri.parse('${ApiConfig.baseUrl}/api/user/categories'),
           );
 
           // Set authorization header

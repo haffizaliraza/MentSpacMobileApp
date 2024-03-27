@@ -10,6 +10,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class AllGroups extends StatefulWidget {
   @override
@@ -44,7 +45,7 @@ class _AllGroupsState extends State<AllGroups> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/user/categories/groups'),
+            Uri.parse('${ApiConfig.baseUrl}/api/user/categories/groups'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ class _AllGroupsState extends State<AllGroups> {
           final String? authToken = tokenMap['auth_token'];
 
           if (authToken != null) {
-            final url = 'http://localhost:8000/api/groups?search=$searchTerm';
+            final url = '${ApiConfig.baseUrl}/api/groups?search=$searchTerm';
             final response = await http.get(
               Uri.parse(url),
               headers: {

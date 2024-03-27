@@ -11,6 +11,7 @@ import 'package:chewie/chewie.dart';
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class PostGroupProps {
   final String username;
@@ -128,7 +129,7 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
       Map<String, dynamic> tokenMap = json.decode(tokenString);
       String? authToken = tokenMap['auth_token'];
       if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments';
+        final apiUrl = '${ApiConfig.baseUrl}/api/comments';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -287,7 +288,7 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
         String? authToken = tokenMap['auth_token'];
 
         if (authToken != null) {
-          final apiUrl = 'http://localhost:8000/api/comments/$deleteId';
+          final apiUrl = '${ApiConfig.baseUrl}/api/comments/$deleteId';
 
           final headers = {
             'Authorization': 'Token $authToken',
@@ -367,7 +368,7 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrl = 'http://localhost:8000/api/comments/$updateId';
+        final apiUrl = '${ApiConfig.baseUrl}/api/comments/$updateId';
 
         final headers = {
           'Authorization': 'Token $authToken',
@@ -813,9 +814,9 @@ class _SingleGroupPostState extends State<SingleGroupPost> {
       String? authToken = tokenMap['auth_token'];
 
       if (authToken != null) {
-        final apiUrlPin = 'http://localhost:8000/api/pin';
+        final apiUrlPin = '${ApiConfig.baseUrl}/api/pin';
         final apiUrlUnPin =
-            'http://localhost:8000/api/pin/${postData.pinned_id}';
+            '${ApiConfig.baseUrl}/api/pin/${postData.pinned_id}';
 
         final headers = {
           'Authorization': 'Token $authToken',

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 typedef void UpdateCallback(bool success);
 
@@ -33,7 +34,7 @@ class UserCard extends StatelessWidget {
 
           if (authToken != null) {
             final response = await http.post(
-              Uri.parse('http://localhost:8000/api/users/block/${userId}'),
+              Uri.parse('${ApiConfig.baseUrl}/api/users/block/${userId}'),
               headers: {
                 'Authorization': 'Token $authToken',
                 'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ class UserCard extends StatelessWidget {
 
           if (authToken != null) {
             final response = await http.post(
-              Uri.parse('http://localhost:8000/api/users/follow/${userId}'),
+              Uri.parse('${ApiConfig.baseUrl}/api/users/follow/${userId}'),
               headers: {
                 'Authorization': 'Token $authToken',
                 'Content-Type': 'application/json',

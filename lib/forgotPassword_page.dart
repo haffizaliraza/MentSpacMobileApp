@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'resetPassword_page.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   TextEditingController emailController = TextEditingController();
 
   // Future<void> handleForgetPassword() async {
-  //   final String apiUrl = 'http://localhost:8000/api/forgot-password';
+  //   final String apiUrl = '${ApiConfig.baseUrl}/api/forgot-password';
 
   //   // Validate email
   //   if (emailController.text.isEmpty) {
@@ -47,7 +48,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   // }
 
   Future<void> handleForgetPassword() async {
-    final String apiUrl = 'http://localhost:8000/api/forgot-password';
+    final String apiUrl = '${ApiConfig.baseUrl}/api/forgot-password';
 
     // Validate email
     if (emailController.text.isEmpty) {

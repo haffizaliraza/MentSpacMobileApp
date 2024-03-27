@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/login_page.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   // Future<void> performResetPassword() async {
-  //   final String apiUrl = 'http://localhost:8000/api/reset-password';
+  //   final String apiUrl = '${ApiConfig.baseUrl}/api/reset-password';
 
   //   try {
   //     final response = await http.post(
@@ -60,7 +61,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   // }
 
   Future<void> performResetPassword() async {
-    final String apiUrl = 'http://localhost:8000/api/reset-password';
+    final String apiUrl = '${ApiConfig.baseUrl}/api/reset-password';
 
     try {
       final response = await http.post(

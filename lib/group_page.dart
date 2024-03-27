@@ -11,6 +11,7 @@ import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/singleGroupPost_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class GroupScreen extends StatefulWidget {
   final String groupId;
@@ -58,7 +59,7 @@ class _GroupScreenState extends State<GroupScreen> {
         print('here is the group id: ${widget.groupId}');
 
         final url =
-            Uri.parse('http://localhost:8000/api/groups/${widget.groupId}');
+            Uri.parse('${ApiConfig.baseUrl}/api/groups/${widget.groupId}');
         try {
           final response = await http.get(url, headers: {
             'Authorization': 'Token $authToken',
@@ -83,6 +84,8 @@ class _GroupScreenState extends State<GroupScreen> {
 
   Future<void> fetchPosts(
       bool updateObject, String fetchFilter, int pageCount) async {
+    isLoading = true;
+
     print('Fetching posts...');
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -98,7 +101,7 @@ class _GroupScreenState extends State<GroupScreen> {
 
         // Use authToken instead of tokenString in the Authorization header
         final url = Uri.parse(
-            'http://localhost:8000/api/groups/${widget.groupId}/posts?page_size=1');
+            '${ApiConfig.baseUrl}/api/groups/${widget.groupId}/posts?page_size=1');
         try {
           final response = await http.get(url, headers: {
             'Authorization': 'Token $authToken',
@@ -344,32 +347,26 @@ class _GroupScreenState extends State<GroupScreen> {
 
               // Display posts
               SizedBox(height: 16),
-              Column(
-                children: result.length > 0
-                    ? result.reversed
-                        .toList()
-                        .map((post) => SingleGroupPost(
-                              // key: Key(post['id'].toString()),
-                              post: post,
-                              groupId: widget.groupId,
-                            ))
-                        .toList()
-                    : [
-                        Text(
+              isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : result.isEmpty
+                      ? Text(
                           'No posts created',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
+                        )
+                      : Column(
+                          children: result
+                              .map((post) => SingleGroupPost(
+                                    post: post,
+                                    groupId: widget.groupId,
+                                  ))
+                              .toList(),
                         ),
-                      ],
-              ),
-              SizedBox(height: 16),
-              isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Container(),
             ],
           ),
         ),

@@ -10,6 +10,7 @@ import 'package:my_flutter_app/singlePost_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'createPost_page.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class HomeFeeds extends StatefulWidget {
   @override
@@ -41,6 +42,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
   Future<void> fetchPosts(
       bool updateObject, String fetchFilter, int pageCount) async {
+    isLoading = true;
     print('Fetching posts...');
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -55,7 +57,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
         // Use authToken instead of tokenString in the Authorization header
         final url = Uri.parse(
-            'http://localhost:8000/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
+            '${ApiConfig.baseUrl}/api/user/joined-groups/posts?filter=$fetchFilter&page=$pageCount');
         try {
           final response = await http.get(url, headers: {
             'Authorization': 'Token $authToken',
@@ -127,8 +129,19 @@ class _HomeFeedsState extends State<HomeFeeds> {
     }
   }
 
+  // void setFilter(String newFilter) {
+  //   setState(() {
+  //     filter = newFilter;
+  //     pageNumber = 1;
+  //     hasMore = true;
+  //     result = [];
+  //     fetchPosts(true, filter, pageNumber);
+  //   });
+  // }
+
   void setFilter(String newFilter) {
     setState(() {
+      _selectedFilter = newFilter; // Set selected filter here
       filter = newFilter;
       pageNumber = 1;
       hasMore = true;
@@ -326,30 +339,25 @@ class _HomeFeedsState extends State<HomeFeeds> {
 
               // Display posts
               SizedBox(height: 16),
-              Column(
-                children: result.length > 0
-                    ? result
-                        .map((post) => SinglePost(
-                              // key: Key(post['id'].toString()),
-                              post: post,
-                            ))
-                        .toList()
-                    : [
-                        Text(
+              isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : result.isEmpty
+                      ? Text(
                           'No posts created',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
+                        )
+                      : Column(
+                          children: result
+                              .map((post) => SinglePost(
+                                    post: post,
+                                  ))
+                              .toList(),
                         ),
-                      ],
-              ),
-              SizedBox(height: 16),
-              isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Container(),
             ],
           ),
         ),

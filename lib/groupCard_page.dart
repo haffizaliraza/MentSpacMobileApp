@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:my_flutter_app/group_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:my_flutter_app/api_config.dart';
 
 class GroupCard extends StatefulWidget {
   final dynamic item;
@@ -43,7 +44,7 @@ class _GroupCardState extends State<GroupCard> {
 
           if (authToken != null) {
             final response = await http.post(
-              Uri.parse('http://localhost:8000/api/groups/join/$id'),
+              Uri.parse('${ApiConfig.baseUrl}/api/groups/join/$id'),
               headers: {
                 'Authorization': 'Token $authToken',
                 'Content-Type': 'application/json',

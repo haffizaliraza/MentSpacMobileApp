@@ -9,6 +9,7 @@ import 'package:my_flutter_app/userCard_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:my_flutter_app/api_config.dart';
 
 class UsersList extends StatefulWidget {
   @override
@@ -53,7 +54,7 @@ class _UsersListState extends State<UsersList> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/users'),
+            Uri.parse('${ApiConfig.baseUrl}/api/users'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',

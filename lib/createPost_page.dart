@@ -11,6 +11,52 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:mime/mime.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:my_flutter_app/api_config.dart';
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  VideoPlayerWidget(this.videoUrl);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(File(widget.videoUrl))
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: _controller.value.aspectRatio,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: <Widget>[
+          VideoPlayer(_controller),
+          VideoProgressIndicator(_controller, allowScrubbing: true),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+}
 
 class FileType {
   final String path;
@@ -34,6 +80,7 @@ class FileType {
 
 final TextEditingController postController = TextEditingController();
 String? imagePreviewUrl;
+String? videoPreviewUrl;
 FileType? files;
 
 class CreatePost extends StatefulWidget {
@@ -114,6 +161,10 @@ class _CreatePostState extends State<CreatePost> {
         });
       } else if (validVideoTypes.contains(files.type)) {
         // Handle video preview
+        setState(() {
+          previewUrl = files.path; // Store the path directly for videos
+          videoPreviewUrl = files.path;
+        });
       } else if (validAudioTypes.contains(files.type)) {
         // Handle audio preview
       } else {
@@ -150,10 +201,15 @@ class _CreatePostState extends State<CreatePost> {
       setState(() {
         previewUrl = MemoryImage(bytes);
         imagePreviewUrl = null;
-        print('Checking the previewUrl: ${previewUrl}');
+        print('Checking the previewUrl image: ${previewUrl}');
       });
     } else if (validVideoTypes.contains(files.type)) {
       // Handle video preview
+      setState(() {
+        previewUrl = bytes; // Store the bytes directly for videos
+        videoPreviewUrl = null;
+        print('Checking the previewUrl video');
+      });
     } else if (validAudioTypes.contains(files.type)) {
       // Handle audio preview
     } else {
@@ -179,12 +235,15 @@ class _CreatePostState extends State<CreatePost> {
         );
         error = "";
         imagePreviewUrl = null;
+        videoPreviewUrl = null;
       });
 
       print(
           'File type: ${files?.type}'); // Use the safe navigation operator (?)
       print(
-          'File path: ${files?.path}'); // Use the safe navigation operator (?)
+          'File path 1: ${files?.path}'); // Use the safe navigation operator (?)
+
+      // print('File path 2: ${result?.files.single.path}');
 
       Future.delayed(Duration(milliseconds: 50), () async {
         if (kIsWeb) {
@@ -211,6 +270,7 @@ class _CreatePostState extends State<CreatePost> {
       isOpen = !isOpen;
       isImage = "image";
       if (files.type.startsWith("video/") || files.type.startsWith("audio/")) {
+        print('inside handleImage');
         setState(() {
           files = FileType(
             path: "",
@@ -242,6 +302,7 @@ class _CreatePostState extends State<CreatePost> {
             type: "",
             webkitRelativePath: "",
           );
+          videoPreviewUrl = null;
         });
       }
     });
@@ -277,7 +338,7 @@ class _CreatePostState extends State<CreatePost> {
 
       final formData = http.MultipartRequest(
         'POST',
-        Uri.parse('http://localhost:8000/api/posts'),
+        Uri.parse('${ApiConfig.baseUrl}/api/posts'),
       );
 
       formData.fields.addAll({
@@ -286,62 +347,19 @@ class _CreatePostState extends State<CreatePost> {
       });
 
       // Add media file if selected
-      // if (files.path.isNotEmpty) {
-      //   File file = File(files.path);
-      //   List<int> fileBytes = await file.readAsBytes();
-      //   String fieldName = 'post_image';
-
-      //   if (isImage == "image") {
-      //     fieldName = 'post_image';
-      //   } else if (isImage == "video") {
-      //     fieldName = 'post_video';
-      //   } else if (isImage == "audio") {
-      //     fieldName = 'post_audio';
-      //   } else {
-      //     // Handle other cases if needed
-      //     return;
-      //   }
-
-      //   // Add the file as bytes to the form data
-      //   // formData.files.add(
-      //   //   http.MultipartFile.fromBytes(fieldName, fileBytes,
-      //   //       filename: files.name),
-      //   // );
-      //   formData.files.add(
-      //     http.MultipartFile.fromBytes(
-      //       fieldName,
-      //       fileBytes,
-      //       filename: 'post_image.${files.type.split('/').last}',
-      //     ),
-      //   );
-      // }
-
       if (files?.path.isNotEmpty == true) {
-        print('File path: ${files?.path}');
+        print('set here');
         File file = File(files?.path ?? "");
         List<int> fileBytes = await file.readAsBytes();
         String fieldName = 'post_image';
 
-        if (isImage == "image") {
-          fieldName = 'post_image';
-        } else if (isImage == "video") {
-          fieldName = 'post_video';
-        } else if (isImage == "audio") {
-          fieldName = 'post_audio';
-        } else {
-          // Handle other cases if needed
-          return;
-        }
-
-        // Add the file as bytes to the form data
         formData.files.add(
           http.MultipartFile.fromBytes(
             fieldName,
             fileBytes,
-            filename: 'post_$isImage.${files.type.split('/').last}',
+            filename: 'post_image.${files?.type.split('/').last}',
           ),
         );
-        print('Added file to formData: ${formData.files}');
       }
 
       // Set authorization header
@@ -388,6 +406,128 @@ class _CreatePostState extends State<CreatePost> {
       }
     }
   }
+
+  // Future<void> handleSubmit() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? tokenString = prefs.getString('token');
+
+  //   if (tokenString != null) {
+  //     Map<String, dynamic> tokenMap = json.decode(tokenString);
+  //     String? authToken = tokenMap['auth_token'];
+
+  //     final formData = http.MultipartRequest(
+  //       'POST',
+  //       Uri.parse('${ApiConfig.baseUrl}/api/posts'),
+  //     );
+
+  //     formData.fields.addAll({
+  //       "post_content": post,
+  //       "like": false.toString(),
+  //     });
+
+  //     // Add media file if selected
+  //     // if (files.path.isNotEmpty) {
+  //     //   File file = File(files.path);
+  //     //   List<int> fileBytes = await file.readAsBytes();
+  //     //   String fieldName = 'post_image';
+
+  //     //   if (isImage == "image") {
+  //     //     fieldName = 'post_image';
+  //     //   } else if (isImage == "video") {
+  //     //     fieldName = 'post_video';
+  //     //   } else if (isImage == "audio") {
+  //     //     fieldName = 'post_audio';
+  //     //   } else {
+  //     //     // Handle other cases if needed
+  //     //     return;
+  //     //   }
+
+  //     //   // Add the file as bytes to the form data
+  //     //   // formData.files.add(
+  //     //   //   http.MultipartFile.fromBytes(fieldName, fileBytes,
+  //     //   //       filename: files.name),
+  //     //   // );
+  //     //   formData.files.add(
+  //     //     http.MultipartFile.fromBytes(
+  //     //       fieldName,
+  //     //       fileBytes,
+  //     //       filename: 'post_image.${files.type.split('/').last}',
+  //     //     ),
+  //     //   );
+  //     // }
+
+  //     if (files?.path.isNotEmpty == true) {
+  //       print('File path: ${files?.path}');
+  //       File file = File(files?.path ?? "");
+  //       List<int> fileBytes = await file.readAsBytes();
+  //       String fieldName = 'post_image';
+
+  //       if (isImage == "image") {
+  //         fieldName = 'post_image';
+  //       } else if (isImage == "video") {
+  //         fieldName = 'post_video';
+  //       } else if (isImage == "audio") {
+  //         fieldName = 'post_audio';
+  //       } else {
+  //         // Handle other cases if needed
+  //         return;
+  //       }
+
+  //       // Add the file as bytes to the form data
+  //       formData.files.add(
+  //         http.MultipartFile.fromBytes(
+  //           fieldName,
+  //           fileBytes,
+  //           filename: 'post_$isImage.${files.type.split('/').last}',
+  //         ),
+  //       );
+  //       print('Added file to formData: ${formData.files}');
+  //     }
+
+  //     // Set authorization header
+  //     formData.headers['Authorization'] = 'Token $authToken';
+
+  //     // Clear form fields after submitting
+  //     setState(() {
+  //       post = "";
+  //       files = FileType(
+  //         path: "",
+  //         lastModified: 0,
+  //         lastModifiedDate: DateTime.now(),
+  //         name: "",
+  //         size: 0,
+  //         type: "",
+  //         webkitRelativePath: "",
+  //       );
+  //       previewUrl = null;
+  //       error = "";
+  //       isOpen = false;
+  //     });
+
+  //     try {
+  //       final response = await formData.send();
+  //       if (response.statusCode == 201) {
+  //         // Handle success, e.g., show a success message to the user
+  //         print('Post created successfully');
+
+  //         Navigator.popUntil(context, (route) => route.isFirst);
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => HomeFeeds(),
+  //           ),
+  //         );
+  //         postController.clear();
+  //       } else {
+  //         // Handle error
+  //         print('Error creating post. Status code: ${response.statusCode}');
+  //       }
+  //     } catch (error) {
+  //       // Handle error
+  //       print('Error creating post: $error');
+  //     }
+  //   }
+  // }
 
   String handleText() {
     if (files.type.startsWith("image/")) {
@@ -458,7 +598,9 @@ class _CreatePostState extends State<CreatePost> {
                           ? Image.memory(Uint8List.fromList(
                               (previewUrl as MemoryImage).bytes))
                           : previewUrl is String
-                              ? Image.network(previewUrl)
+                              ? (files.type.startsWith("image/")
+                                  ? Image.network(previewUrl)
+                                  : VideoPlayerWidget(previewUrl))
                               : Container(),
                     ),
                   // Action Buttons Section

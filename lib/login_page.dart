@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'user_token.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -279,7 +280,7 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    final String apiUrl = 'http://localhost:8000/api/auth/login';
+    final String apiUrl = '${ApiConfig.baseUrl}/api/auth/login';
 
     try {
       final response = await http.post(

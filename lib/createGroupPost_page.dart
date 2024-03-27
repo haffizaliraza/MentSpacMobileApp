@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:mime/mime.dart';
 import 'package:flutter/foundation.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class FileType {
   final String path;
@@ -280,7 +281,7 @@ class _CreateGroupPostState extends State<CreateGroupPost> {
 
       final formData = http.MultipartRequest(
         'POST',
-        Uri.parse('http://localhost:8000/api/posts'),
+        Uri.parse('${ApiConfig.baseUrl}/api/posts'),
       );
 
       formData.fields.addAll({
