@@ -30,25 +30,29 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(File(widget.videoUrl))
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.play();
-      });
+    if (widget.videoUrl.isNotEmpty) {
+      _controller = VideoPlayerController.network(widget.videoUrl)
+        ..initialize().then((_) {
+          setState(() {});
+          _controller.play();
+        });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: _controller.value.aspectRatio,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          VideoPlayer(_controller),
-          VideoProgressIndicator(_controller, allowScrubbing: true),
-        ],
-      ),
-    );
+    return _controller.value.isInitialized
+        ? AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                VideoPlayer(_controller),
+                VideoProgressIndicator(_controller, allowScrubbing: true),
+              ],
+            ),
+          )
+        : Container(); // Return an empty container if video is not initialized
   }
 
   @override
@@ -348,16 +352,28 @@ class _CreatePostState extends State<CreatePost> {
 
       // Add media file if selected
       if (files?.path.isNotEmpty == true) {
-        print('set here');
+        print('File path: ${files?.path}');
         File file = File(files?.path ?? "");
         List<int> fileBytes = await file.readAsBytes();
-        String fieldName = 'post_image';
+        String fieldName = '';
 
+        if (files.type.startsWith("image/")) {
+          fieldName = 'post_image';
+        } else if (files.type.startsWith("video/")) {
+          fieldName = 'post_video';
+        } else if (files.type.startsWith("audio/")) {
+          fieldName = 'post_audio';
+        } else {
+          // Handle other file types if needed
+          return;
+        }
+
+        // Add the file as bytes to the form data
         formData.files.add(
           http.MultipartFile.fromBytes(
             fieldName,
             fileBytes,
-            filename: 'post_image.${files?.type.split('/').last}',
+            filename: 'post_$fieldName.${files.type.split('/').last}',
           ),
         );
       }
