@@ -506,8 +506,6 @@ class _CreateGroupPostState extends State<CreateGroupPost> {
       onTap: () {
         // Call handleDrop directly when tapping on the icon
         if (label == "Image" || label == "Video" || label == "Audio") {
-          handleDrop();
-        } else {
           onPressed();
         }
       },

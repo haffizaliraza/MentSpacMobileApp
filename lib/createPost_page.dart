@@ -637,8 +637,6 @@ class _CreatePostState extends State<CreatePost> {
       onTap: () {
         // Call handleDrop directly when tapping on the icon
         if (label == "Image" || label == "Video" || label == "Audio") {
-          handleDrop();
-        } else {
           onPressed();
         }
       },

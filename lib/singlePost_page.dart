@@ -80,6 +80,48 @@ class SinglePost extends StatefulWidget {
   _SinglePostState createState() => _SinglePostState();
 }
 
+// class VideoPlayerWidget extends StatefulWidget {
+//   final String videoUrl;
+
+//   const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
+
+//   @override
+//   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+// }
+
+// class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+//   late VideoPlayerController _controller;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _controller = VideoPlayerController.network(widget.videoUrl)
+//       ..initialize().then((_) {
+//         setState(() {}); // Ensure the widget rebuilds after initialization
+//       });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (_controller.value.isInitialized) {
+//       print('inside if of build');
+//       return AspectRatio(
+//         aspectRatio: _controller.value.aspectRatio,
+//         child: VideoPlayer(_controller),
+//       );
+//     } else {
+//       print('inside else build');
+//       return CircularProgressIndicator(); // Show loading indicator while initializing
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     super.dispose();
+//     _controller.dispose(); // Dispose the video player controller
+//   }
+// }
+
 final TextEditingController commentController = TextEditingController();
 
 class _SinglePostState extends State<SinglePost> {
@@ -456,12 +498,11 @@ class _SinglePostState extends State<SinglePost> {
   // }
 
   void _initializeVideoPlayer() {
-    print('hihihisdxcg ${Uri.parse(postData.post_video!)}');
     _chewieController = ChewieController(
       videoPlayerController: VideoPlayerController.networkUrl(
         Uri.parse(postData.post_video!),
       ),
-      autoPlay: false,
+      autoPlay: true,
       looping: false,
     );
   }
@@ -516,6 +557,23 @@ class _SinglePostState extends State<SinglePost> {
       return Container();
     }
   }
+
+  // Widget renderMediaContent() {
+  //   if (postData.post_image != null && postData.post_image.isNotEmpty) {
+  //     return Image.network(
+  //       postData.post_image,
+  //       width: 300,
+  //       height: 200,
+  //       errorBuilder: (context, error, stackTrace) {
+  //         return const Placeholder();
+  //       },
+  //     );
+  //   } else if (postData.post_video != null && postData.post_video.isNotEmpty) {
+  //     return VideoPlayerWidget(videoUrl: postData.post_video);
+  //   } else {
+  //     return Container();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

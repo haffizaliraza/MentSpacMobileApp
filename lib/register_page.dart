@@ -7,6 +7,7 @@ import 'home_page.dart';
 import 'terms_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -33,7 +34,7 @@ class _RegisterState extends State<Register> {
   bool isLoading = false;
 
   Future<void> registerUser(BuildContext context) async {
-    final String apiUrl = 'http://localhost:8000/api/auth/register';
+    final String apiUrl = '${ApiConfig.baseUrl}/api/auth/register';
 
     // Reset validation errors
     setState(() {
