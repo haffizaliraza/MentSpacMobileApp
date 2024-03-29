@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/category_page.dart';
 import 'register_page.dart';
@@ -224,36 +223,37 @@ class _LoginPageState extends State<LoginPage> {
         final GoogleSignInAuthentication googleSignInAuthentication =
             await googleSignInAccount.authentication;
 
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleSignInAuthentication.accessToken,
-          idToken: googleSignInAuthentication.idToken,
+        final response = await http.post(
+          Uri.parse('${ApiConfig.baseUrl}/api/auth/google_login'),
+          body: {
+            'access_token': googleSignInAuthentication.accessToken,
+            'email': googleSignInAccount.email,
+          },
         );
 
-        final UserCredential authResult =
-            await _auth.signInWithCredential(credential);
-        final User? user = authResult.user;
-
-        if (user != null) {
-          // Successful Google sign-in
-          print('Google sign-in successful! User: ${user.displayName}');
-
-          // Show a snackbar
+        if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Google Sign-In Successful!'),
               backgroundColor: Colors.green,
             ),
           );
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          final UserToken userToken = UserToken.fromJson(responseData);
 
-          // TODO: Implement your logic after successful sign-in
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('token', json.encode(userToken.toJson()));
+
+          // Navigate to the next page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => CategoryPage()),
+          );
         } else {
-          // Google sign-in failed
-          print('Google sign-in failed');
-
-          // Show a snackbar
+          // Show an error snackbar
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Google Sign-In Failed'),
+              content: Text('Error signing in with Google'),
               backgroundColor: Colors.red,
             ),
           );
