@@ -218,6 +218,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await _googleSignIn.signIn();
+      print('googlesigninaccount $googleSignInAccount');
 
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
@@ -228,6 +229,10 @@ class _LoginPageState extends State<LoginPage> {
           body: {
             'access_token': googleSignInAuthentication.accessToken,
             'email': googleSignInAccount.email,
+            'first_name': googleSignInAccount.displayName?.split(" ")[0] ?? '',
+            'last_name': googleSignInAccount.displayName?.split(" ")[1] ?? '',
+            'imageUrl': googleSignInAccount.photoUrl ?? '',
+            'password': 'Pa\$\$w0rd!',
           },
         );
 
