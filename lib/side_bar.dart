@@ -86,33 +86,18 @@ class _SideBarState extends State<SideBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('MentSpac User Chats'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: ElevatedButton(
-              onPressed: addPeopleClickHandler,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.blue, // Use your preferred primary color
-                padding: EdgeInsets.all(15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 3, // Add shadow
-              ),
-              child: Text(
-                'Add People',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
@@ -136,8 +121,7 @@ class _SideBarState extends State<SideBar> {
                               backgroundImage: member['user_image'] != null &&
                                       member['user_image'].isNotEmpty
                                   ? NetworkImage(member['user_image'])
-                                  : AssetImage(
-                                          'assets/images/default_user_image.jpg')
+                                  : AssetImage('assets/testimonial-2.jpg')
                                       as ImageProvider<Object>,
                             ),
                             title: Text(
@@ -178,9 +162,7 @@ class _SideBarState extends State<SideBar> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Do something similar
-        },
+        onPressed: addPeopleClickHandler,
         child: Icon(Icons.add),
       ),
     );
@@ -225,6 +207,10 @@ class _SideBarState extends State<SideBar> {
 
   void addPeopleClickHandler() {
     fetchUsers();
+  }
+
+  void refreshUI() {
+    fetchChatUser();
   }
 }
 
@@ -322,6 +308,12 @@ class Modal extends StatelessWidget {
                           trailing: ElevatedButton(
                             onPressed: () {
                               addUserToChat(user['id']);
+                              // Close modal and update UI
+                              modalCloseHandler();
+                              // Access refreshUI from _SideBarState instance
+                              (context as Element)
+                                  .findAncestorStateOfType<_SideBarState>()!
+                                  .refreshUI();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,

@@ -36,15 +36,40 @@ class _ChatBodyState extends State<ChatBody> {
     fetchUserChat();
   }
 
+  // void connectToSocket() {
+  //   channel = WebSocketChannel.connect(
+  //       Uri.parse('ws://localhost:8000/ws/users/1/chat/'));
+  //   channel.stream.listen((message) {
+  //     print('Received message: $message');
+  //     setState(() {
+  //       userChat.add(
+  //           jsonDecode(message)); // Update the chat history with new message
+  //     });
+  //   });
+  // }
+
   void connectToSocket() {
     channel = WebSocketChannel.connect(
         Uri.parse('ws://localhost:8000/ws/users/1/chat/'));
     channel.stream.listen((message) {
       print('Received message: $message');
-      setState(() {
-        userChat.add(
-            jsonDecode(message)); // Update the chat history with new message
-      });
+      try {
+        Map<String, dynamic> parsedMessage = jsonDecode(message);
+        // Check if the message contains required fields
+        if (parsedMessage.containsKey('action') &&
+            parsedMessage.containsKey('message') &&
+            parsedMessage.containsKey('roomId') &&
+            parsedMessage.containsKey('user')) {
+          setState(() {
+            // Add the validated message to the chat history
+            userChat.add(parsedMessage);
+          });
+        } else {
+          print('Received message does not have all required fields');
+        }
+      } catch (e) {
+        print('Error decoding message: $e');
+      }
     });
   }
 
@@ -136,7 +161,22 @@ class _ChatBodyState extends State<ChatBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.currentChattingMember['post_username']),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage:
+                  widget.currentChattingMember['user_image'] != null &&
+                          widget.currentChattingMember['user_image'].isNotEmpty
+                      ? NetworkImage(widget.currentChattingMember['user_image'])
+                      : AssetImage('assets/testimonial-2.jpg')
+                          as ImageProvider, // Cast to ImageProvider
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            Text(widget.currentChattingMember['post_username']),
+          ],
+        ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())

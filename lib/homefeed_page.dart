@@ -6,6 +6,7 @@ import 'package:my_flutter_app/allGroups_page.dart';
 import 'package:my_flutter_app/category_page.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/login_page.dart';
+import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/singlePost_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -231,6 +232,15 @@ class _HomeFeedsState extends State<HomeFeeds> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UsersList()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Chat'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SideBar()),
                 );
               },
             ),

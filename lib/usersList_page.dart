@@ -5,6 +5,7 @@ import 'package:my_flutter_app/category_page.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
+import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/userCard_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -150,7 +151,6 @@ class _UsersListState extends State<UsersList> {
                 ),
               ),
             ),
-
             ListTile(
               title: Text('Home Feed'),
               onTap: () {
@@ -169,16 +169,15 @@ class _UsersListState extends State<UsersList> {
                 );
               },
             ),
-
-            // ListTile(
-            //   title: Text('Users'),
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) => UsersList()),
-            //     );
-            //   },
-            // ),
+            ListTile(
+              title: Text('Chat'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SideBar()),
+                );
+              },
+            ),
             ListTile(
               title: Text('Groups'),
               onTap: () {
