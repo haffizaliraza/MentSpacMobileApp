@@ -19,6 +19,8 @@ class SideBar extends StatefulWidget {
 class _SideBarState extends State<SideBar> {
   List<dynamic> chatUsers = []; // sidebar users
   List<dynamic> users = []; // popup users
+  List<dynamic> filteredUsers = [];
+  List<dynamic> userArray = [];
   bool isShowAddPeopleModal = false;
   String? chat_id = '1';
   int currentUserID = 1;
@@ -71,8 +73,16 @@ class _SideBarState extends State<SideBar> {
           );
 
           if (response.statusCode == 200) {
+            filteredUsers = jsonDecode(response.body);
+            filteredUsers.forEach((item) {
+              if (item['member'].length >= 2) {
+                userArray.add(item['member'][1]);
+              }
+            });
+            print(userArray);
             setState(() {
-              chatUsers = jsonDecode(response.body);
+              chatUsers = userArray;
+              isLoading = false;
             });
             print('chat users is here: $chatUsers');
           } else {
@@ -86,10 +96,6 @@ class _SideBarState extends State<SideBar> {
       }
     } catch (error) {
       print('Error fetching chat users: $error');
-    } finally {
-      setState(() {
-        isLoading = false; // Stop loading
-      });
     }
   }
 
@@ -216,49 +222,23 @@ class _SideBarState extends State<SideBar> {
                 : ListView.builder(
                     itemCount: chatUsers.length,
                     itemBuilder: (context, index) {
-                      dynamic chatRoom = chatUsers[index];
-                      Set<String> displayedUserIds = Set();
-
-                      List<Widget> memberTiles = [];
-
-                      if (chatRoom['member'][1] != null) {
-                        for (var member in [chatRoom['member'][1]]) {
-                          if (!displayedUserIds
-                              .contains(member['id'].toString())) {
-                            memberTiles.add(
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 20),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    radius: 25, // Adjust avatar size
-                                    backgroundImage: member['user_image'] !=
-                                                null &&
-                                            member['user_image'].isNotEmpty
-                                        ? NetworkImage(member['user_image'])
-                                        : AssetImage('assets/testimonial-2.jpg')
-                                            as ImageProvider<Object>,
-                                  ),
-                                  title: Text(
-                                    member['post_username'] != null &&
-                                            member['post_username'].isNotEmpty
-                                        ? member['post_username']
-                                        : 'No Name',
-                                  ),
-                                  onTap: () {
-                                    handleUserTap(member, chatRoom['roomId']);
-                                  },
-                                ),
-                              ),
-                            );
-                            displayedUserIds.add(member['id'].toString());
-                          }
-                        }
-                      }
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: memberTiles,
+                      final user = chatUsers[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          radius: 25,
+                          backgroundImage: user['user_image'] != null &&
+                                  user['user_image'].isNotEmpty
+                              ? NetworkImage(user[
+                                  'user_image']) // Use NetworkImage for online image URLs
+                              : AssetImage('assets/testimonial-2.jpg')
+                                  as ImageProvider<
+                                      Object>, // Use AssetImage for local assets
+                        ),
+                        title: Text(user['post_username'] ??
+                            'No Name'), // Display username or fallback to 'No Name'
+                        onTap: () {
+                          // handleUserTap(context, chatRoom['roomId']);
+                        },
                       );
                     },
                   ),

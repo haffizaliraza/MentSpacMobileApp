@@ -288,7 +288,7 @@ class _CategoryPageState extends State<CategoryPage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DummyScreen()),
+                  MaterialPageRoute(builder: (context) => SideBar()),
                 );
               },
             ),
