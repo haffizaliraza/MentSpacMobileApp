@@ -127,7 +127,7 @@ class _SideBarState extends State<SideBar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20),
-          Expanded(
+          Flexible(
             child: isLoading
                 ? Center(
                     child: CircularProgressIndicator(),
@@ -165,8 +165,6 @@ class _SideBarState extends State<SideBar> {
                                         : 'No Name',
                                   ),
                                   onTap: () {
-                                    // Handle tap event for this user
-                                    // print('Tapped on ${member['post_username']}');
                                     handleUserTap(member, chatRoom['roomId']);
                                   },
                                 ),
