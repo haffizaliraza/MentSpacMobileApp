@@ -75,11 +75,12 @@ class _SideBarState extends State<SideBar> {
           if (response.statusCode == 200) {
             filteredUsers = jsonDecode(response.body);
             filteredUsers.forEach((item) {
+              print(item['roomId']);
               if (item['member'].length >= 2) {
-                userArray.add(item['member'][1]);
+                userArray.add(
+                    {'member': item['member'][1], 'roomId': item['roomId']});
               }
             });
-            print(userArray);
             setState(() {
               chatUsers = userArray;
               isLoading = false;
@@ -222,7 +223,8 @@ class _SideBarState extends State<SideBar> {
                 : ListView.builder(
                     itemCount: chatUsers.length,
                     itemBuilder: (context, index) {
-                      final user = chatUsers[index];
+                      final user = chatUsers[index]['member'];
+                      final roomId = chatUsers[index]['roomId'];
                       return ListTile(
                         leading: CircleAvatar(
                           radius: 25,
@@ -237,7 +239,7 @@ class _SideBarState extends State<SideBar> {
                         title: Text(user['post_username'] ??
                             'No Name'), // Display username or fallback to 'No Name'
                         onTap: () {
-                          // handleUserTap(context, chatRoom['roomId']);
+                          handleUserTap(user, roomId);
                         },
                       );
                     },
