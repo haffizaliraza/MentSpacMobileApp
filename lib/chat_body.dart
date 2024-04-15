@@ -36,21 +36,9 @@ class _ChatBodyState extends State<ChatBody> {
     fetchUserChat();
   }
 
-  // void connectToSocket() {
-  //   channel = WebSocketChannel.connect(
-  //       Uri.parse('ws://localhost:8000/ws/users/1/chat/'));
-  //   channel.stream.listen((message) {
-  //     print('Received message: $message');
-  //     setState(() {
-  //       userChat.add(
-  //           jsonDecode(message)); // Update the chat history with new message
-  //     });
-  //   });
-  // }
-
   void connectToSocket() {
     channel = WebSocketChannel.connect(
-        Uri.parse('ws://localhost:8000/ws/users/1/chat/'));
+        Uri.parse('ws://localhost:8000/ws/users/$currentUserID/chat/'));
     channel.stream.listen((message) {
       print('Received message: $message');
       try {
