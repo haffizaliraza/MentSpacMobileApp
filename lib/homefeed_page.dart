@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/about_page.dart';
 import 'package:my_flutter_app/allGroups_page.dart';
 import 'package:my_flutter_app/category_page.dart';
+import 'package:my_flutter_app/dummyScreen.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
@@ -241,7 +242,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SideBar()),
+                  MaterialPageRoute(builder: (context) => DummyScreen()),
                 );
               },
             ),

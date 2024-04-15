@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_flutter_app/about_page.dart';
 import 'package:my_flutter_app/allGroups_page.dart';
 import 'package:my_flutter_app/category_page.dart';
+import 'package:my_flutter_app/dummyScreen.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
@@ -175,7 +176,7 @@ class _UsersListState extends State<UsersList> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SideBar()),
+                  MaterialPageRoute(builder: (context) => DummyScreen()),
                 );
               },
             ),

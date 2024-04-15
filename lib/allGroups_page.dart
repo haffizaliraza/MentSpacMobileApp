@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/about_page.dart';
 import 'package:my_flutter_app/category_page.dart';
+import 'package:my_flutter_app/dummyScreen.dart';
 import 'dart:convert';
 import 'package:my_flutter_app/groupCard_page.dart';
 // import 'package:my_flutter_app/group_page.dart';
@@ -198,7 +199,7 @@ class _AllGroupsState extends State<AllGroups> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SideBar()),
+                  MaterialPageRoute(builder: (context) => DummyScreen()),
                 );
               },
             ),
