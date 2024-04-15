@@ -9,6 +9,7 @@ import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
+import 'package:my_flutter_app/sidebar.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_flutter_app/api_config.dart';
