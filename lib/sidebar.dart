@@ -263,16 +263,16 @@ class _SideBarState extends State<SideBar> {
                     },
                   ),
           ),
-          Modal(
-              show: isShowAddPeopleModal,
-              modalCloseHandler: () {
-                setState(() {
-                  isShowAddPeopleModal = false;
-                });
-              },
-              users: users,
-              currentUserID: currentUserID,
-              refreshUI: refreshUI),
+          // Modal(
+          //     show: isShowAddPeopleModal,
+          //     modalCloseHandler: () {
+          //       setState(() {
+          //         isShowAddPeopleModal = false;
+          //       });
+          //     },
+          //     users: users,
+          //     currentUserID: currentUserID,
+          //     refreshUI: refreshUI),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -319,8 +319,18 @@ class _SideBarState extends State<SideBar> {
     }
   }
 
-  void addPeopleClickHandler() {
-    fetchUsers();
+  void addPeopleClickHandler() async {
+    await fetchUsers(); // Fetch users before navigating
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddPeopleScreen(
+          users: users, // Pass the fetched users list
+          currentUserID: currentUserID,
+          refreshUI: refreshUI,
+        ),
+      ),
+    );
   }
 
   void refreshUI() {
