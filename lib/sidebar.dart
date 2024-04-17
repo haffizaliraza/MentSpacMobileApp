@@ -285,7 +285,7 @@ class _SideBarState extends State<SideBar> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/users?followers=true'),
+            Uri.parse('${ApiConfig.baseUrl}/api/users?followers=true'),
             // Uri.parse('${ApiConfig.baseUrl}/api/unchatted'),
             headers: {
               'Authorization': 'Token $authToken',
