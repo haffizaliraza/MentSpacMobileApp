@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class ChatBody extends StatefulWidget {
   final Map<String, dynamic> currentChattingMember;
@@ -27,10 +28,13 @@ class _ChatBodyState extends State<ChatBody> {
   bool _isLoading = true;
   String _errorMessage = '';
   late WebSocketChannel channel;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollToBottomOnLayout();
     getCurrentUserId();
     connectToSocket();
     fetchUserChat();
@@ -108,7 +112,7 @@ class _ChatBodyState extends State<ChatBody> {
         if (authToken != null) {
           final response = await http.get(
             Uri.parse(
-                'http://localhost:8000/api/chats/${widget.roomId}/messages?limit=20&offset=0'),
+                '${ApiConfig.baseUrl}/api/chats/${widget.roomId}/messages?limit=20&offset=0'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -121,6 +125,7 @@ class _ChatBodyState extends State<ChatBody> {
               userChat = results;
               _isLoading = false;
             });
+            _scrollToBottomOnLayout();
           } else {
             throw Exception('Failed to fetch chat users');
           }
@@ -141,6 +146,7 @@ class _ChatBodyState extends State<ChatBody> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     channel.sink.close();
     super.dispose();
   }
@@ -175,7 +181,9 @@ class _ChatBodyState extends State<ChatBody> {
                   children: [
                     Expanded(
                       child: ListView.builder(
+                        controller: _scrollController,
                         itemCount: userChat.length,
+                        physics: AlwaysScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           final message = userChat[index];
                           final isSentByCurrentUser =
@@ -248,6 +256,7 @@ class _ChatBodyState extends State<ChatBody> {
                             onPressed: () {
                               sendMessage(_messageController.text.trim());
                               _messageController.clear();
+                              _scrollToBottom();
                             },
                             child: Icon(Icons.send),
                           ),
@@ -257,5 +266,23 @@ class _ChatBodyState extends State<ChatBody> {
                   ],
                 ),
     );
+  }
+
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _scrollToBottomOnLayout() {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
   }
 }

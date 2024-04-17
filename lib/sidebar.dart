@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/allGroups_page.dart';
@@ -6,10 +7,10 @@ import 'package:my_flutter_app/category_page.dart';
 import 'package:my_flutter_app/chat_body.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
-import 'package:my_flutter_app/modal.dart';
+import 'package:my_flutter_app/addPeopleScreen.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io' show Platform;
+import 'package:my_flutter_app/api_config.dart';
 
 class SideBar extends StatefulWidget {
   @override
@@ -17,14 +18,15 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> {
-  List<dynamic> chatUsers = []; // sidebar users
-  List<dynamic> users = []; // popup users
+  List<dynamic> chatUsers = [];
+  List<dynamic> users = [];
   List<dynamic> filteredUsers = [];
   List<dynamic> userArray = [];
   bool isShowAddPeopleModal = false;
   String? chat_id = '1';
   int currentUserID = 1;
   bool isLoading = false;
+  List<dynamic> uniqueUsersArray = [];
 
   @override
   void initState() {
@@ -51,8 +53,9 @@ class _SideBarState extends State<SideBar> {
   }
 
   Future<void> fetchChatUser() async {
+    print('this is in fetch chat');
     setState(() {
-      isLoading = true; // Start loading
+      isLoading = true;
     });
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -65,7 +68,7 @@ class _SideBarState extends State<SideBar> {
         if (authToken != null) {
           print('before call $currentUserID');
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/users/$currentUserID/chats'),
+            Uri.parse('${ApiConfig.baseUrl}/api/users/$currentUserID/chats'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -75,17 +78,37 @@ class _SideBarState extends State<SideBar> {
           if (response.statusCode == 200) {
             filteredUsers = jsonDecode(response.body);
             filteredUsers.forEach((item) {
-              print(item['roomId']);
               if (item['member'].length >= 2) {
-                userArray.add(
-                    {'member': item['member'][1], 'roomId': item['roomId']});
+                print(item['roomId']);
+
+                int length = userArray.length;
+
+                if (length == 0) {
+                  userArray.add(
+                      {'member': item['member'][1], 'roomId': item['roomId']});
+                } else {
+                  bool found = false;
+                  for (var el in userArray) {
+                    if (el['member']['id'] == item['member'][1]['id']) {
+                      found = true;
+                      break;
+                    }
+                  }
+                  ;
+                  if (!found) {
+                    userArray.add({
+                      'member': item['member'][1],
+                      'roomId': item['roomId']
+                    });
+                  }
+                }
               }
             });
             setState(() {
               chatUsers = userArray;
               isLoading = false;
             });
-            print('chat users is here: $chatUsers');
+            print('chat users is here: $userArray');
           } else {
             throw Exception('Failed to fetch chat users');
           }
@@ -103,8 +126,6 @@ class _SideBarState extends State<SideBar> {
   void handleUserTap(dynamic member, dynamic roomId) {
     print('Member: $member');
     if (member != null) {
-      // Add more checks if necessary
-      // Access member properties here
       print('Member ID: ${member['id']}');
       print('Member name: ${member['post_username']}');
 
@@ -128,16 +149,12 @@ class _SideBarState extends State<SideBar> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
 
-    // Print statements for debugging
     print('Token removed from local storage');
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LandingPage()),
     );
-
-    // Print statement for debugging
-    print('Navigation to login screen executed');
   }
 
   @override
@@ -151,7 +168,7 @@ class _SideBarState extends State<SideBar> {
           padding: EdgeInsets.zero,
           children: [
             Container(
-              height: 100, // Adjust the height as needed
+              height: 100,
               child: DrawerHeader(
                 decoration: BoxDecoration(
                   color: Color.fromARGB(255, 183, 228, 245),
@@ -210,7 +227,6 @@ class _SideBarState extends State<SideBar> {
           ],
         ),
       ),
-      // backgroundColor: Color.fromARGB(255, 183, 228, 245),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -225,36 +241,30 @@ class _SideBarState extends State<SideBar> {
                     itemBuilder: (context, index) {
                       final user = chatUsers[index]['member'];
                       final roomId = chatUsers[index]['roomId'];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          radius: 25,
-                          backgroundImage: user['user_image'] != null &&
-                                  user['user_image'].isNotEmpty
-                              ? NetworkImage(user[
-                                  'user_image']) // Use NetworkImage for online image URLs
-                              : AssetImage('assets/testimonial-2.jpg')
-                                  as ImageProvider<
-                                      Object>, // Use AssetImage for local assets
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16), // Added padding
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            radius: 30, // Increased avatar size
+                            backgroundImage: user['user_image'] != null &&
+                                    user['user_image'].isNotEmpty
+                                ? NetworkImage(user['user_image'])
+                                : AssetImage('assets/testimonial-2.jpg')
+                                    as ImageProvider<Object>,
+                          ),
+                          title: Text(user['post_username'] ?? 'No Name'),
+                          // subtitle: Text('Online'), // Added subtitle for status
+                          trailing:
+                              Icon(Icons.arrow_forward_ios), // Added arrow icon
+                          onTap: () {
+                            handleUserTap(user, roomId);
+                          },
                         ),
-                        title: Text(user['post_username'] ??
-                            'No Name'), // Display username or fallback to 'No Name'
-                        onTap: () {
-                          handleUserTap(user, roomId);
-                        },
                       );
                     },
                   ),
           ),
-          // Modal(
-          //     show: isShowAddPeopleModal,
-          //     modalCloseHandler: () {
-          //       setState(() {
-          //         isShowAddPeopleModal = false;
-          //       });
-          //     },
-          //     users: users,
-          //     currentUserID: currentUserID,
-          //     refreshUI: refreshUI),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -275,7 +285,8 @@ class _SideBarState extends State<SideBar> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/users?followers=true'),
+            // Uri.parse('http://localhost:8000/api/users?followers=true'),
+            Uri.parse('${ApiConfig.baseUrl}/api/unchatted'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -287,6 +298,7 @@ class _SideBarState extends State<SideBar> {
               users = jsonDecode(response.body);
               isShowAddPeopleModal = true;
             });
+            print('users unchatted $users');
           } else {
             throw Exception('Failed to fetch users');
           }
@@ -302,12 +314,12 @@ class _SideBarState extends State<SideBar> {
   }
 
   void addPeopleClickHandler() async {
-    await fetchUsers(); // Fetch users before navigating
+    await fetchUsers();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddPeopleScreen(
-          users: users, // Pass the fetched users list
+          users: users,
           currentUserID: currentUserID,
           refreshUI: refreshUI,
         ),

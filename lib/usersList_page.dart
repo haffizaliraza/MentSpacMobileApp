@@ -176,7 +176,7 @@ class _UsersListState extends State<UsersList> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DummyScreen()),
+                  MaterialPageRoute(builder: (context) => SideBar()),
                 );
               },
             ),

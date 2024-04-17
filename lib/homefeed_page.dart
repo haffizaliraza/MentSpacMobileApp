@@ -242,7 +242,7 @@ class _HomeFeedsState extends State<HomeFeeds> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DummyScreen()),
+                  MaterialPageRoute(builder: (context) => SideBar()),
                 );
               },
             ),

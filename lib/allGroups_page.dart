@@ -199,7 +199,7 @@ class _AllGroupsState extends State<AllGroups> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DummyScreen()),
+                  MaterialPageRoute(builder: (context) => SideBar()),
                 );
               },
             ),
