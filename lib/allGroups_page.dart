@@ -11,6 +11,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
+import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_flutter_app/api_config.dart';
@@ -184,7 +185,6 @@ class _AllGroupsState extends State<AllGroups> {
                 ),
               ),
             ),
-
             ListTile(
               title: Text('Home Feed'),
               onTap: () {
@@ -221,16 +221,15 @@ class _AllGroupsState extends State<AllGroups> {
                 );
               },
             ),
-
-            // ListTile(
-            //   title: Text('Groups'),
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) => AllGroups()),
-            //     );
-            //   },
-            // ),
+            ListTile(
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfilePage()),
+                );
+              },
+            ),
             ListTile(
               title: Text('Logout'),
               onTap: () {

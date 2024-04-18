@@ -9,6 +9,7 @@ import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
 import 'package:my_flutter_app/userCard_page.dart';
+import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -186,6 +187,15 @@ class _UsersListState extends State<UsersList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AllGroups()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfilePage()),
                 );
               },
             ),

@@ -8,6 +8,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
+import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -289,6 +290,15 @@ class _CategoryPageState extends State<CategoryPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SideBar()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfilePage()),
                 );
               },
             ),

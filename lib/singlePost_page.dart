@@ -502,7 +502,7 @@ class _SinglePostState extends State<SinglePost> {
       videoPlayerController: VideoPlayerController.networkUrl(
         Uri.parse(postData.post_video!),
       ),
-      autoPlay: true,
+      autoPlay: false,
       looping: false,
     );
   }
