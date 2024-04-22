@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:my_flutter_app/about_page.dart';
 import 'package:my_flutter_app/allGroups_page.dart';
-import 'package:my_flutter_app/dummyScreen.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
-import 'package:my_flutter_app/login_page.dart';
-import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
+import 'package:my_flutter_app/liveStreams.dart';
 import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'dart:convert';
@@ -299,6 +296,15 @@ class _CategoryPageState extends State<CategoryPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UserProfilePage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Live Streams'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StreamsListPage()),
                 );
               },
             ),

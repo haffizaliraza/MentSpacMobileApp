@@ -8,6 +8,7 @@ import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
+import 'package:my_flutter_app/liveStreams.dart';
 import 'package:my_flutter_app/userCard_page.dart';
 import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -196,6 +197,15 @@ class _UsersListState extends State<UsersList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UserProfilePage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Live Streams'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StreamsListPage()),
                 );
               },
             ),

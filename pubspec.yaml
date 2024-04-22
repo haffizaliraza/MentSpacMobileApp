@@ -10,30 +10,31 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.1
-  cupertino_icons: ^1.0.6
-  shared_preferences: ^2.0.10
-  flutter_svg: ^0.22.0
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.3
+  flutter_svg: ^2.0.10+1
   carousel_slider: ^4.0.0
-  fluttertoast: ^8.0.7
+  fluttertoast: ^8.2.5
   flutter_redux: ^0.10.0
   redux: ^5.0.0
   redux_thunk: ^0.4.0
-  file_picker: ^4.0.0
+  file_picker: ^8.0.1
   mime_type: ^1.0.0
-  chewie: ^1.5.0
+  chewie: ^1.8.1
   mime: ^1.0.5
   google_sign_in: ^6.2.1
   google_sign_in_web: ^0.12.4
-  firebase_auth: ^4.16.0
-  intl: ^0.17.0
+  firebase_auth: ^4.19.2
+  intl: ^0.19.0
   socket_io_client: ^2.0.3+1
-  web_socket_channel: ^2.4.4
+  web_socket_channel: ^2.4.5
+  
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^3.0.2
 
 flutter:
   uses-material-design: true
