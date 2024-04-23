@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_flutter_app/videoPlayerScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_flutter_app/api_config.dart';
 
@@ -237,6 +238,8 @@ class _StreamsListPageState extends State<StreamsListPage> {
                             return StreamCard(
                               heading: _streamData[index]['heading'],
                               description: _streamData[index]['description'],
+                              streamData: _streamData, // Pass _streamData here
+                              index: index, // Pass index here
                             );
                           } else {
                             return SizedBox.shrink();
@@ -256,10 +259,14 @@ class _StreamsListPageState extends State<StreamsListPage> {
 class StreamCard extends StatelessWidget {
   final String heading;
   final String description;
+  final List<dynamic> streamData;
+  final int index;
 
   const StreamCard({
     required this.heading,
     required this.description,
+    required this.streamData,
+    required this.index,
   });
 
   @override
@@ -270,7 +277,13 @@ class StreamCard extends StatelessWidget {
         title: Text(heading),
         subtitle: Text(description),
         onTap: () {
-          // Add your onTap logic here
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  VideoPlayerScreen(videoUrl: streamData[index]['server_url']),
+            ),
+          );
         },
       ),
     );
