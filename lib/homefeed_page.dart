@@ -7,6 +7,7 @@ import 'package:my_flutter_app/category_page.dart';
 import 'package:my_flutter_app/dummyScreen.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/login_page.dart';
+import 'package:my_flutter_app/notificationPage.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
 import 'package:my_flutter_app/singlePost_page.dart';
@@ -253,6 +254,15 @@ class _HomeFeedsState extends State<HomeFeeds> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UserProfilePage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Notifications'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
                 );
               },
             ),

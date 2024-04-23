@@ -9,6 +9,7 @@ import 'package:my_flutter_app/groupCard_page.dart';
 import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/login_page.dart';
+import 'package:my_flutter_app/notificationPage.dart';
 import 'package:my_flutter_app/side_bar.dart';
 import 'package:my_flutter_app/sidebar.dart';
 import 'package:my_flutter_app/liveStreams.dart';
@@ -219,6 +220,15 @@ class _AllGroupsState extends State<AllGroups> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UsersList()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Notifications'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
                 );
               },
             ),

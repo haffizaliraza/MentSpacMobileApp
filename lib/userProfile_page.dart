@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -35,7 +36,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/userprofile'),
+            Uri.parse('${ApiConfig.baseUrl}/api/userprofile'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_app/api_config.dart';
 
 class StreamsListPage extends StatefulWidget {
   @override
@@ -37,7 +38,7 @@ class _StreamsListPageState extends State<StreamsListPage> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/go-live'),
+            Uri.parse('${ApiConfig.baseUrl}/api/go-live'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',
@@ -99,7 +100,7 @@ class _StreamsListPageState extends State<StreamsListPage> {
 
         if (authToken != null) {
           final response = await http.get(
-            Uri.parse('http://localhost:8000/api/user/categories/groups'),
+            Uri.parse('${ApiConfig.baseUrl}/api/user/categories/groups'),
             headers: {
               'Authorization': 'Token $authToken',
               'Content-Type': 'application/json',

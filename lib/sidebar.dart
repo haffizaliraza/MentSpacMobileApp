@@ -9,6 +9,7 @@ import 'package:my_flutter_app/home_page.dart';
 import 'package:my_flutter_app/homefeed_page.dart';
 import 'package:my_flutter_app/addPeopleScreen.dart';
 import 'package:my_flutter_app/liveStreams.dart';
+import 'package:my_flutter_app/notificationPage.dart';
 import 'package:my_flutter_app/userProfile_page.dart';
 import 'package:my_flutter_app/usersList_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -217,6 +218,15 @@ class _SideBarState extends State<SideBar> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AllGroups()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Notifications'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()),
                 );
               },
             ),
